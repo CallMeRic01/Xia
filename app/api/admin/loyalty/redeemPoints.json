@@ -1,0 +1,382 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_order.ejs",
+      "linkedForm": "pointsRedeem"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "cust_id",
+        "name": "cust_id"
+      },
+      {
+        "type": "number",
+        "fieldName": "pRedeemed",
+        "options": {
+          "rules": {
+            "core:number": {}
+          }
+        },
+        "name": "pRedeemed"
+      },
+      {
+        "type": "text",
+        "fieldName": "cust_id2",
+        "name": "cust_id2"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "query_cust",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "customer",
+                "column": "cust_loyalP",
+                "recid": 1
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.cust_id}}",
+                "test": "3"
+              }
+            ],
+            "table": {
+              "name": "customer"
+            },
+            "query": "select `cust_loyalP` from `customer` where `customer`.`cust_id` = ?",
+            "primary": "cust_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "customer.cust_id",
+                  "field": "customer.cust_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.cust_id}}",
+                  "data": {
+                    "table": "customer",
+                    "column": "cust_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "increments",
+                      "primary": true,
+                      "nullable": false,
+                      "name": "cust_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "customer"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "orders": []
+          }
+        },
+        "output": true,
+        "outputType": "object",
+        "meta": [
+          {
+            "type": "number",
+            "name": "cust_loyalP"
+          }
+        ],
+        "type": "dbconnector_single"
+      },
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "customer",
+                "column": "cust_loyalP"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.cust_id}}",
+                "test": "1"
+              }
+            ],
+            "table": {
+              "name": "customer"
+            },
+            "primary": "cust_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "customer.cust_id",
+                  "field": "customer.cust_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.cust_id}}",
+                  "data": {
+                    "table": "customer",
+                    "column": "cust_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "increments",
+                      "primary": true,
+                      "nullable": false,
+                      "name": "cust_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "customer"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `cust_loyalP` from `customer` where `customer`.`cust_id` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "number",
+            "name": "cust_loyalP"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "redeemedPoints",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_redeemedPoints",
+          "value": "{{$_POST.pRedeemed*9}}"
+        },
+        "meta": [],
+        "outputType": "text"
+      },
+      {
+        "name": "new_loyaltyP",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_new_loyaltyP",
+          "value": "{{query[0].cust_loyalP-redeemedPoints}}"
+        },
+        "meta": [
+          {
+            "name": "cust_loyalP",
+            "type": "number"
+          }
+        ],
+        "outputType": "number",
+        "output": true
+      },
+      {
+        "name": "update",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "customer",
+                "column": "cust_loyalP",
+                "type": "number",
+                "value": "{{new_loyaltyP}}"
+              }
+            ],
+            "table": "customer",
+            "returning": "cust_id",
+            "query": "update `customer` set `cust_loyalP` = ? where `cust_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{new_loyaltyP}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{$_POST.cust_id}}",
+                "test": ""
+              }
+            ],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "cust_id",
+                  "field": "cust_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.cust_id}}",
+                  "data": {
+                    "column": "cust_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            }
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "name": "query1",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "customer",
+                "column": "cust_email"
+              },
+              {
+                "table": "customer",
+                "column": "cust_loyalP"
+              },
+              {
+                "table": "customer",
+                "column": "cust_name"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.cust_id}}",
+                "test": "3"
+              }
+            ],
+            "table": {
+              "name": "customer"
+            },
+            "primary": "cust_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "customer.cust_id",
+                  "field": "customer.cust_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.cust_id}}",
+                  "data": {
+                    "table": "customer",
+                    "column": "cust_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "increments",
+                      "primary": true,
+                      "nullable": false,
+                      "name": "cust_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "customer"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `cust_email`, `cust_loyalP`, `cust_name` from `customer` where `customer`.`cust_id` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "text",
+            "name": "cust_email"
+          },
+          {
+            "type": "number",
+            "name": "cust_loyalP"
+          },
+          {
+            "type": "text",
+            "name": "cust_name"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "",
+        "module": "mail",
+        "action": "send",
+        "options": {
+          "instance": "mail",
+          "subject": "Loyalty Points",
+          "fromName": "noreply@xiadessert",
+          "fromEmail": "eric.lim@triwind.net",
+          "toName": "{{query1[0].cust_name}}",
+          "toEmail": "{{query1[0].cust_email}}",
+          "body": "You have successfully redeemed {{$_POST.pRedeemed}} free drinks\nYou have {{query1[0].cust_loyalP}} points left"
+        },
+        "disabled": true
+      },
+      {
+        "name": "",
+        "module": "mail",
+        "action": "send",
+        "options": {
+          "instance": "xiad_mail",
+          "subject": "Loyalty Points",
+          "fromName": "noreply@xiadessert",
+          "fromEmail": "noreply@xiadessert.fundingproexpert.com",
+          "toName": "{{query1[0].cust_name}}",
+          "toEmail": "{{query1[0].cust_email}}",
+          "body": "You have successfully redeemed {{$_POST.pRedeemed}} free drinks\nYou have {{query1[0].cust_loyalP}} points left"
+        }
+      }
+    ]
+  }
+}

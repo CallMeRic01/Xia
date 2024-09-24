@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "dayofweek"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "dayOfWeek"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [],
+          "params": [
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.dayofweek}}",
+              "test": ""
+            }
+          ],
+          "table": {
+            "name": "product"
+          },
+          "primary": "pro_id",
+          "joins": [
+            {
+              "table": "productByDay",
+              "column": "*",
+              "type": "INNER",
+              "clauses": {
+                "condition": "AND",
+                "rules": [
+                  {
+                    "table": "productByDay",
+                    "column": "pro_id",
+                    "operator": "equal",
+                    "operation": "=",
+                    "value": {
+                      "table": "product",
+                      "column": "pro_id"
+                    }
+                  }
+                ]
+              },
+              "primary": "pd_id"
+            }
+          ],
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "productByDay.pd_day",
+                "field": "productByDay.pd_day",
+                "type": "string",
+                "operator": "equal",
+                "value": "{{$_GET.dayofweek}}",
+                "data": {
+                  "table": "productByDay",
+                  "column": "pd_day",
+                  "type": "text",
+                  "columnObj": {
+                    "type": "enum",
+                    "enumValues": [
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday"
+                    ],
+                    "maxLength": 9,
+                    "primary": false,
+                    "nullable": true,
+                    "name": "pd_day"
+                  }
+                },
+                "operation": "="
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          },
+          "query": "select * from `product` inner join `productByDay` on `productByDay`.`pro_id` = `product`.`pro_id` where `productByDay`.`pd_day` = ?"
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "pro_id"
+        },
+        {
+          "type": "text",
+          "name": "pro_name"
+        },
+        {
+          "type": "number",
+          "name": "pro_price"
+        },
+        {
+          "type": "text",
+          "name": "pro_desc"
+        },
+        {
+          "type": "boolean",
+          "name": "pro_stat"
+        },
+        {
+          "type": "number",
+          "name": "pro_stock"
+        },
+        {
+          "type": "text",
+          "name": "pro_image"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

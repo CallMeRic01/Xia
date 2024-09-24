@@ -1,0 +1,329 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/accountValidation.ejs",
+      "linkedForm": "form1"
+    },
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "user_authCode",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_authCode"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_email",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:email": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_email"
+      },
+      {
+        "type": "number",
+        "name": "user_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "xiaD"
+        },
+        "output": true,
+        "meta": [],
+        "disabled": true
+      },
+      {
+        "name": "codycode",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9"
+        },
+        "meta": [],
+        "outputType": "text",
+        "disabled": true
+      },
+      {
+        "name": "codearrayy",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{codycode.split(',')}}"
+        },
+        "meta": [],
+        "outputType": "text",
+        "disabled": true
+      },
+      {
+        "name": "randomCodey",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{codearrayy.randomize()}}",
+          "key": "g_randomCodey"
+        },
+        "meta": [],
+        "outputType": "text",
+        "disabled": true
+      },
+      {
+        "name": "codey",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_codey"
+        },
+        "meta": [],
+        "outputType": "text",
+        "disabled": true
+      },
+      {
+        "name": "repeat",
+        "module": "core",
+        "action": "repeat",
+        "options": {
+          "repeat": 6,
+          "outputFields": [],
+          "exec": {
+            "steps": {
+              "name": "codey",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "g_codey",
+                "value": "{{g_codey+randomCodey[$index]}}"
+              },
+              "meta": [],
+              "outputType": "text"
+            }
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "$index",
+            "type": "number"
+          },
+          {
+            "name": "$number",
+            "type": "number"
+          },
+          {
+            "name": "$name",
+            "type": "text"
+          },
+          {
+            "name": "$value",
+            "type": "object"
+          }
+        ],
+        "outputType": "array",
+        "disabled": true
+      },
+      {
+        "name": "update",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "user",
+                "column": "user_authCode",
+                "type": "text",
+                "value": "{{g_codey}}",
+                "recid": 1
+              }
+            ],
+            "table": "user",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user_id",
+                  "field": "user_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{identity}}",
+                  "data": {
+                    "column": "user_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "user_id",
+            "query": "update `user` set `user_authCode` = ? where `user_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{g_codey}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{identity}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true,
+        "disabled": true
+      },
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "user",
+                "column": "user_id",
+                "recid": 1
+              },
+              {
+                "table": "user",
+                "column": "user_authCode",
+                "recid": 2
+              },
+              {
+                "table": "user",
+                "column": "user_firstName",
+                "recid": 3
+              },
+              {
+                "table": "user",
+                "column": "user_lastName",
+                "recid": 4
+              },
+              {
+                "table": "user",
+                "column": "user_email",
+                "recid": 5
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{identity}}",
+                "test": "19"
+              }
+            ],
+            "table": {
+              "name": "user"
+            },
+            "primary": "user_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user.user_id",
+                  "field": "user.user_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{identity}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_id",
+                    "type": "number",
+                    "columnObj": {
+                      "type": "increments",
+                      "primary": true,
+                      "unique": false,
+                      "nullable": false,
+                      "name": "user_id"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "user"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `user_id`, `user_authCode`, `user_firstName`, `user_lastName`, `user_email` from `user` where `user`.`user_id` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "number",
+            "name": "user_id"
+          },
+          {
+            "type": "text",
+            "name": "user_authCode"
+          },
+          {
+            "type": "text",
+            "name": "user_firstName"
+          },
+          {
+            "type": "text",
+            "name": "user_lastName"
+          },
+          {
+            "type": "text",
+            "name": "user_email"
+          }
+        ],
+        "outputType": "object",
+        "disabled": true
+      },
+      {
+        "name": "",
+        "module": "mail",
+        "action": "send",
+        "options": {
+          "instance": "mail",
+          "subject": "Your Code",
+          "fromName": "Website",
+          "fromEmail": "eric.lim@triwind.net",
+          "toName": "{{query.user_firstName}}",
+          "toEmail": "{{query.user_email}}",
+          "body": "{{g_codey}}"
+        },
+        "disabled": true
+      }
+    ]
+  }
+}

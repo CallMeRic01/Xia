@@ -1,0 +1,13 @@
+{
+  "name": "",
+  "module": "auth",
+  "action": "restrict",
+  "options": {
+    "provider": "xiaD",
+    "permissions": [
+      "Admin"
+    ],
+    "forbiddenUrl": "/admin_order",
+    "loginUrl": "/login"
+  }
+}

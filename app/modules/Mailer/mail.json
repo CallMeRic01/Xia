@@ -1,0 +1,11 @@
+{
+  "name": "mail",
+  "module": "mail",
+  "action": "setup",
+  "options": {
+    "host": "smtp-mail.outlook.com",
+    "port": 587,
+    "username": "eric.lim@triwind.net",
+    "password": "Elml0110!?123"
+  }
+}

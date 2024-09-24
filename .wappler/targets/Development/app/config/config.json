@@ -1,0 +1,15 @@
+{
+  "debug": true,
+  "tmpFolder": "/upload/debug",
+  "secret": "E4837xwZFo0Ywf0",
+  "cors": {
+    "origin": "*"
+  },
+  "env": {
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "3306",
+    "DB_USER": "fundingp_xiad1",
+    "DB_PASSWORD": "Xiad123!@#Xiad",
+    "DB_NAME": "fundingp_xiad"
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "limit"
+      },
+      {
+        "type": "text",
+        "name": "offset"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "selected_date"
+      }
+    ],
+    "$_PARAM": [
+      {
+        "type": "text",
+        "name": ":limit"
+      },
+      {
+        "type": "text",
+        "name": ":offet"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "Custom_querySalesHistory",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "SELECT \n  DATE(ord_date) AS ord_date, \n  SUM(ord_totalAmount) AS total_sales\nFROM \n  `order`\nWHERE\n  (:selected_date IS NULL OR DATE(ord_date) = :selected_date)\nGROUP BY \n  DATE(ord_date)\nORDER BY \n  ord_date DESC;\n",
+            "params": [
+              {
+                "name": ":selected_date",
+                "value": "{{$_GET.selected_date}}",
+                "test": "",
+                "recid": 1
+              }
+            ]
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "ord_date",
+            "type": "date"
+          },
+          {
+            "name": "total_sales",
+            "type": "text"
+          }
+        ],
+        "outputType": "array",
+        "disabled": true
+      },
+      {
+        "name": "query",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "SELECT \n  DATE(ord_date) AS ord_date, \n  SUM(ord_totalAmount) AS Total_Sales, \n  salesReport.rep_opening, \n  salesReport.rep_closing, \n  salesReport.rep_expenses, \n  salesReport.rep_remarks, \n  salesReport.rep_proLoss, \n  salesReport.rep_date \nFROM \n  `order` \nINNER JOIN \n  salesReport \nON \n  DATE(ord_date) = salesReport.rep_date \nWHERE \n  DATE(ord_date) = :selected_date\nGROUP BY \n  DATE(ord_date), \n  salesReport.rep_opening, \n  salesReport.rep_closing, \n  salesReport.rep_expenses, \n  salesReport.rep_remarks, \n  salesReport.rep_proLoss, \n  salesReport.rep_date\nORDER BY \n  DATE(ord_date) DESC;\n",
+            "params": [
+              {
+                "name": ":selected_date",
+                "value": "{{$_GET.selected_date}}",
+                "test": "2024-7-23",
+                "recid": 1
+              }
+            ]
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "ord_date",
+            "type": "date"
+          },
+          {
+            "name": "Total_Sales",
+            "type": "text"
+          },
+          {
+            "name": "rep_opening",
+            "type": "text"
+          },
+          {
+            "name": "rep_closing",
+            "type": "text"
+          },
+          {
+            "name": "rep_expenses",
+            "type": "text"
+          },
+          {
+            "name": "rep_remarks",
+            "type": "text"
+          },
+          {
+            "name": "rep_proLoss",
+            "type": "text"
+          },
+          {
+            "name": "rep_date",
+            "type": "datetime"
+          }
+        ],
+        "type": "dbcustom_query"
+      }
+    ]
+  }
+}

@@ -1,0 +1,329 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/login.ejs",
+      "linkedForm": "form1"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "user_email",
+        "name": "user_email"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{$_POST.user_email}}",
+          "then": {
+            "steps": [
+              {
+                "name": "validate",
+                "module": "validator",
+                "action": "validate",
+                "options": {
+                  "data": [
+                    {
+                      "name": "validate_1",
+                      "value": "{{$_POST.user_email}}",
+                      "rules": {
+                        "db:exists": {
+                          "param": {
+                            "connection": "db",
+                            "table": "user",
+                            "column": "user_email"
+                          }
+                        }
+                      },
+                      "fieldName": "resetPWemail"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "query1",
+                "module": "dbconnector",
+                "action": "single",
+                "options": {
+                  "connection": "db",
+                  "sql": {
+                    "type": "select",
+                    "columns": [
+                      {
+                        "table": "user",
+                        "column": "user_email"
+                      },
+                      {
+                        "table": "user",
+                        "column": "user_pw"
+                      }
+                    ],
+                    "params": [
+                      {
+                        "operator": "equal",
+                        "type": "expression",
+                        "name": ":P1",
+                        "value": "{{$_POST.user_email}}",
+                        "test": ""
+                      }
+                    ],
+                    "table": {
+                      "name": "user"
+                    },
+                    "primary": "user_id",
+                    "joins": [],
+                    "wheres": {
+                      "condition": "AND",
+                      "rules": [
+                        {
+                          "id": "user.user_email",
+                          "field": "user.user_email",
+                          "type": "string",
+                          "operator": "equal",
+                          "value": "{{$_POST.user_email}}",
+                          "data": {
+                            "table": "user",
+                            "column": "user_email",
+                            "type": "text",
+                            "columnObj": {
+                              "type": "string",
+                              "maxLength": 255,
+                              "primary": false,
+                              "nullable": true,
+                              "name": "user_email"
+                            }
+                          },
+                          "operation": "="
+                        }
+                      ],
+                      "conditional": null,
+                      "valid": true
+                    },
+                    "query": "select `user_email`, `user_pw` from `user` where `user`.`user_email` = ?"
+                  }
+                },
+                "output": true,
+                "meta": [
+                  {
+                    "type": "text",
+                    "name": "user_email"
+                  },
+                  {
+                    "type": "text",
+                    "name": "user_pw"
+                  }
+                ],
+                "outputType": "object"
+              },
+              {
+                "name": "hashh",
+                "module": "core",
+                "action": "setvalue",
+                "options": {
+                  "key": "g_hashh",
+                  "value": "{{query1.user_email.sha1(query1.user_pw)}}"
+                },
+                "meta": [],
+                "outputType": "text",
+                "output": false
+              },
+              {
+                "name": "emaill",
+                "module": "core",
+                "action": "setvalue",
+                "options": {
+                  "key": "g_emaill",
+                  "value": "{{query1.user_email}}"
+                },
+                "meta": [],
+                "outputType": "text"
+              },
+              {
+                "name": "",
+                "module": "mail",
+                "action": "send",
+                "options": {
+                  "instance": "mail",
+                  "subject": "Your reset link",
+                  "fromName": "noreply@XiaDessert",
+                  "fromEmail": "eric.lim@triwind.net",
+                  "toEmail": "{{$_POST.user_email}}",
+                  "contentType": "html",
+                  "body": "<p>Click <a href=\"http://localhost:8100/reset_password?email={{g_emaill}}&id={{g_hashh}}\">Here </a>to Reset Password</p>"
+                }
+              }
+            ]
+          },
+          "else": {
+            "steps": {
+              "name": "Error",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": "Invalid",
+                "data": "This email is not registered"
+              }
+            }
+          }
+        },
+        "outputType": "boolean"
+      },
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "user",
+                "column": "user_email",
+                "recid": 1
+              },
+              {
+                "table": "user",
+                "column": "user_pw",
+                "recid": 2
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.user_email}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "user"
+            },
+            "primary": "user_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user.user_email",
+                  "field": "user.user_email",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.user_email}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_email",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "nullable": true,
+                      "name": "user_email"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "user"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `user_email`, `user_pw` from `user` where `user`.`user_email` = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "text",
+            "name": "user_email"
+          },
+          {
+            "type": "text",
+            "name": "user_pw"
+          }
+        ],
+        "outputType": "array",
+        "disabled": true
+      },
+      {
+        "name": "repeat",
+        "module": "core",
+        "action": "repeat",
+        "options": {
+          "repeat": "{{query}}",
+          "outputFields": [],
+          "exec": {
+            "steps": [
+              {
+                "name": "hash",
+                "module": "core",
+                "action": "setvalue",
+                "options": {
+                  "key": "g_hash",
+                  "value": "{{user_email.sha1(user_pw)}}"
+                },
+                "meta": [],
+                "outputType": "text"
+              },
+              {
+                "name": "email",
+                "module": "core",
+                "action": "setvalue",
+                "options": {
+                  "key": "g_email",
+                  "value": "{{user_email}}"
+                },
+                "meta": [],
+                "outputType": "text"
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "$index",
+            "type": "number"
+          },
+          {
+            "name": "$number",
+            "type": "number"
+          },
+          {
+            "name": "$name",
+            "type": "text"
+          },
+          {
+            "name": "$value",
+            "type": "object"
+          },
+          {
+            "name": "user_email",
+            "type": "text"
+          },
+          {
+            "name": "user_pw",
+            "type": "text"
+          }
+        ],
+        "outputType": "array",
+        "disabled": true
+      }
+    ]
+  }
+}

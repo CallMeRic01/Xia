@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "selected_date"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "offset"
+      },
+      {
+        "type": "text",
+        "name": "limit"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbupdater",
+      "action": "custom",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "query": "SELECT \n  ord_id,\n  DATE(ord_date) AS ord_date,\n  ord_totalAmount\nFROM \n  `order`\nWHERE \n  DATE(ord_date) = :selected_date\nORDER BY\n  ord_date DESC\n",
+          "params": [
+            {
+              "name": ":selected_date",
+              "value": "{{$_GET.selected_date}}",
+              "test": "2024-7-22",
+              "recid": 1
+            }
+          ]
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "name": "ord_id",
+          "type": "number"
+        },
+        {
+          "name": "ord_date",
+          "type": "date"
+        },
+        {
+          "name": "ord_totalAmount",
+          "type": "text"
+        }
+      ],
+      "type": "dbcustom_query"
+    }
+  }
+}

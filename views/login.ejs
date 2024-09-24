@@ -1,0 +1,60 @@
+<!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="login" appConnect="local" components="{dmxBrowser:{},dmxNotifications:{},dmxValidator:{},dmxBootstrap5Modal:{}}" -->
+<dmx-serverconnect id="conn_requestReset" url="/api/registration/sendResetCode"></dmx-serverconnect>
+<!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="login" appconnect="local" components="{dmxBrowser:{},dmxNotifications:{},dmxValidator:{}}" -->
+<dmx-notifications id="notifies1"></dmx-notifications>
+<meta name="ac:route" content="/login">
+<div is="dmx-browser" id="browser1"></div>
+<div class="container">
+    <form id="login1" method="post" action="/api/registration/login" is="dmx-serverconnect-form" dmx-on:success="browser1.goto('/admin_order');notifies1.success('Login Succeed')" dmx-on:forbidden="browser1.goto('/accountValidation')" dmx-on:error="notifies1.warning('Email or Password Error. Please Try Again!')" dmx-on:unauthorized="notifies1.danger('Unauthorized')">
+        <div class="row">
+            <div class="col-12 col-md-8 col-lg-7 col-xl-5 text-start">
+                <div class="row">
+                    <div class="col">
+                        <h1>Log In</h1>
+                        <p class="text-h3">Enter your details below.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mt-4">
+                        <input type="email" id="inp_email" name="user_email" class="form-control" placeholder="Email" required="" data-rule-email="">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <input type="password" id="inp_password" name="user_pw" class="form-control" placeholder="Password" required="">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <button id="login1_submit" class="btn text-bg-primary" type="submit">Login</button>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="input1" name="remember">
+                            <label class="form-check-label" for="input1">Remember Me&nbsp;</label>
+                        </div>
+                        <p>Don't have an account? <a href="/register">Register Here</a><br><a dmx-on:click="reset.ResetPw.show()">Forgot password</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <form id="reset" method="post" is="dmx-serverconnect-form" action="/api/registration/sendResetCode" dmx-on:success="ResetPw.hide();reset.reset();notifies1.success('Reset Password Link has been sent to your email')" dmx-on:invalid="notifies1.warning('Email is not registered')">
+        <div class="modal" id="ResetPw" is="dmx-bs5-modal" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reset Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Email:&nbsp;</p>
+                        <input id="ResetPWemail" name="user_email" type="email" class="form-control" required="" data-rule-email="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Send Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

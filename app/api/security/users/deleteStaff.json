@@ -1,0 +1,124 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "fieldName": "user_id",
+        "name": "user_id"
+      },
+      {
+        "type": "text",
+        "name": "role_id"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "user_id"
+      },
+      {
+        "type": "text",
+        "name": "role_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "delete1",
+        "module": "dbupdater",
+        "action": "delete",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "delete",
+            "table": "role",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "role_id",
+                  "field": "role_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_GET.role_id}}",
+                  "data": {
+                    "column": "role_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "role_id",
+            "query": "delete from `role` where `role_id` = ?",
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.role_id}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "name": "delete",
+        "module": "dbupdater",
+        "action": "delete",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "delete",
+            "table": "user",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user_id",
+                  "field": "user_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_GET.user_id}}",
+                  "data": {
+                    "column": "user_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "user_id",
+            "query": "delete from `user` where `user_id` = ?",
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.user_id}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true
+      }
+    ]
+  }
+}

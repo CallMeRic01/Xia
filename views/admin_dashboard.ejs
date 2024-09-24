@@ -1,0 +1,239 @@
+<!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="admin_dashboard" appConnect="local" components="{dmxBootstrap5Navigation:{},dmxCharts:{},dmxBootstrap5TableGenerator:{},dmxStateManagement:{},dmxBootstrap5PagingGenerator:{},dmxBootstrap5Modal:{},dmxDatePicker:{},dmxFormatter:{},dmxPdfCreator:{}}" jquery_slim_35="cdn" moment_2="cdn" -->
+<dmx-serverconnect id="conn_viewOrder" url="/api/admin/order/viewOrder" dmx-param:ord_id="todaySalesHistory.tableRepeat2.ord_id"></dmx-serverconnect>
+<dmx-serverconnect id="conn_openCloseDatePick" url="/api/admin/sales/openCloseDatePick" dmx-param:selected_date="historyModal.text3.value"></dmx-serverconnect>
+<dmx-serverconnect id="conn_filteredMonth" url="/api/admin/sales/filteredMonthSales" dmx-param:selected_year_month="text2.value"></dmx-serverconnect>
+<dmx-serverconnect id="conn_filteredSales" url="/api/admin/sales/filteredSales" dmx-param:selected_date="text1.value" dmx-param:selected_year_month="text2.value"></dmx-serverconnect>
+<dmx-serverconnect id="conn_topProductTDY" url="/api/admin/sales/topProductToday"></dmx-serverconnect>
+<dmx-serverconnect id="conn_todaySalesH" url="/api/admin/sales/todaySales" dmx-param:selected_date="todaySalesHistory.text4.value" dmx-param:offset="query1.data.offset"></dmx-serverconnect>
+<dmx-query-manager id="query1"></dmx-query-manager>
+
+<meta name="ac:route" content="/admin_dashboard">
+<%- await include('/partials/navbar', Object.assign({}, locals)) %>
+
+<dmx-serverconnect id="conn_topProducts" url="/api/admin/sales/topProducts"></dmx-serverconnect>
+<dmx-serverconnect id="conn_totalSalesToday" url="/api/admin/sales/totalSalesToday" dmx-param:selected_date=""></dmx-serverconnect>
+<dmx-serverconnect id="conn_salesHistory" url="/api/admin/sales/salesHistory" dmx-param:limit="" dmx-param:offset="" dmx-param:selected_date="historyModal.text3.value"></dmx-serverconnect>
+<dmx-variable id="currentPage" value="1"></dmx-variable>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div class="container">
+    <h1 class="mb-4">Admin Dashboard</h1>
+    <div class="row mb-4">
+        <div class="col style1 fade-in-down">
+            <div class="card border-primary mb-3" dmx-on:click="historyModal.show()">
+                <div class="card-header bg-primary text-white">Total Sales Today</div>
+                <div class="card-body pb-0">
+
+                    <p class="card-text"><b>Total Sales</b>: RM {{conn_totalSalesToday.data.query[0].total_sales}}</p>
+
+                    <div class="row">
+                        <div class="col">
+                            <p class="card-text"><b>Opening Cash</b>: RM {{conn_totalSalesToday.data.openCloseToday[0].rep_opening}}</p>
+                        </div>
+                        <div class="col">
+                            <p class="card-text"><b>Closing Cash</b>: RM {{conn_totalSalesToday.data.openCloseToday[0].rep_closing}}</p>
+                        </div>
+                        <div class="col">
+                            <p class="card-text"><b>Expenses</b>: RM {{conn_totalSalesToday.data.openCloseToday[0].rep_expenses}}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p><b>Remarks</b>: {{conn_totalSalesToday.data.openCloseToday[0].rep_remarks}}</p>
+                        </div>
+                        <div class="col">
+                            <p><b>Profit or Loss</b>: {{conn_totalSalesToday.data.openCloseToday[0].rep_proLoss}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col fade-in-down">
+            <div class="card border-info mb-3">
+                <div class="card-header bg-info text-white">Top 3 Most Sold Products</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover table-sm">
+                            <thead>
+                                <tr class="text-black">
+                                    <th class="text-black">Product name</th>
+                                    <th class="text-black">Total sold</th>
+                                    <th class="text-black">Total amount (RM)</th>
+                                </tr>
+                            </thead>
+                            <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_topProducts.data.query" id="tableRepeat4">
+                                <tr>
+                                    <td dmx-text="pro_name"></td>
+                                    <td dmx-text="total_sold"></td>
+                                    <td dmx-text="total_amount"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col fade-in-down">
+            <div class="card border-success mb-3">
+                <div class="card-header bg-success text-white">Top 3 Products Sold Today</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th class="text-black">Product name</th>
+                                    <th class="text-black">Total sold</th>
+                                    <th class="text-black">Total amount (RM)</th>
+                                </tr>
+                            </thead>
+                            <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_topProductTDY.data.custom" id="tableRepeat5">
+                                <tr>
+                                    <td dmx-text="pro_name"></td>
+                                    <td dmx-text="total_sold"></td>
+                                    <td dmx-text="total_amount"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col fade-in-down">
+            <button class="btn btn-primary" dmx-on:click="todaySalesHistory.show()" id="SalesHistory">View Sales History</button>
+        </div>
+    </div>
+    <div class="modal fade" id="historyModal" is="dmx-bs5-modal" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sales History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="text3" name="text3" type="date" class="form-control mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th class="text-black">Order Date</th>
+                                    <th class="text-black">Total sales</th>
+                                    <th class="text-black">Opening</th>
+                                    <th class="text-black">Closing</th>
+                                    <th class="text-black">Expenses</th>
+                                    <th class="text-black">Remarks</th>
+                                    <th class="text-black">Profit/Loss</th>
+                                </tr>
+                            </thead>
+                            <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_salesHistory.data.query" id="tableRepeat3">
+                                <tr>
+                                    <td dmx-text="ord_date.formatDate('dd/MM/yyyy')"></td>
+                                    <td dmx-text="Total_Sales"></td>
+                                    <td dmx-text="rep_opening"></td>
+                                    <td dmx-text="rep_closing"></td>
+                                    <td dmx-text="rep_expenses"></td>
+                                    <td dmx-text="rep_remarks"></td>
+                                    <td dmx-text="rep_proLoss"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <ul class="pagination" dmx-populate="conn_salesHistory.data.Custom_querySalesHistory" dmx-state="query1" dmx-offset="offset" dmx-generator="bs5paging">
+                        <li class="page-item" dmx-class:disabled="conn_salesHistory.data.Custom_querySalesHistory.page.current == 1" aria-label="First">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_salesHistory.data.Custom_querySalesHistory.page.offset.first)"><span aria-hidden="true">&lsaquo;&lsaquo;</span></a>
+                        </li>
+                        <li class="page-item" dmx-class:disabled="conn_salesHistory.data.Custom_querySalesHistory.page.current == 1" aria-label="Previous">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_salesHistory.data.Custom_querySalesHistory.page.offset.prev)"><span aria-hidden="true">&lsaquo;</span></a>
+                        </li>
+                        <li class="page-item" dmx-class:active="title == conn_salesHistory.data.Custom_querySalesHistory.page.current" dmx-class:disabled="!active" dmx-repeat="conn_salesHistory.data.Custom_querySalesHistory.getServerConnectPagination(2,1,'...')">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',(page-1)*conn_salesHistory.data.Custom_querySalesHistory.limit)">{{title}}</a>
+                        </li>
+                        <li class="page-item" dmx-class:disabled="conn_salesHistory.data.Custom_querySalesHistory.page.current ==  conn_salesHistory.data.Custom_querySalesHistory.page.total" aria-label="Next">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_salesHistory.data.Custom_querySalesHistory.page.offset.next)"><span aria-hidden="true">&rsaquo;</span></a>
+                        </li>
+                        <li class="page-item" dmx-class:disabled="conn_salesHistory.data.Custom_querySalesHistory.page.current ==  conn_salesHistory.data.Custom_querySalesHistory.page.total" aria-label="Last">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_salesHistory.data.Custom_querySalesHistory.page.offset.last)"><span aria-hidden="true">&rsaquo;&rsaquo;</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="todaySalesHistory" is="dmx-bs5-modal" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Today Sales History</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="text4" name="text4" type="date" class="form-control mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Amount (RM)</th>
+                                </tr>
+                            </thead>
+                            <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_todaySalesH.data.query" id="tableRepeat2">
+                                <tr>
+                                    <td dmx-text="ord_id"></td>
+                                    <td dmx-text="ord_date.formatDate('dd/MM/yyyy hh:mm')"></td>
+                                    <td dmx-text="ord_totalAmount"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <ul class="pagination" dmx-populate="conn_todaySalesH.data.query" dmx-state="query1" dmx-offset="offset" dmx-generator="bs5paging">
+                        <li class="page-item" dmx-class:disabled="conn_todaySalesH.data.query.page.current == 1" aria-label="First">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_todaySalesH.data.query.page.offset.first)"><span aria-hidden="true">&lsaquo;&lsaquo;</span></a>
+                        </li>
+                        <li class="page-item" dmx-class:disabled="conn_todaySalesH.data.query.page.current == 1" aria-label="Previous">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_todaySalesH.data.query.page.offset.prev)"><span aria-hidden="true">&lsaquo;</span></a>
+                        </li>
+                        <li class="page-item" dmx-class:active="title == conn_todaySalesH.data.query.page.current" dmx-class:disabled="!active" dmx-repeat="conn_todaySalesH.data.query.getServerConnectPagination(2,1,'...')">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',(page-1)*conn_todaySalesH.data.query.limit)">{{title}}</a>
+                        </li>
+                        <li class="page-item" dmx-class:disabled="conn_todaySalesH.data.query.page.current ==  conn_todaySalesH.data.query.page.total" aria-label="Next">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_todaySalesH.data.query.page.offset.next)"><span aria-hidden="true">&rsaquo;</span></a>
+                        </li>
+                        <li class="page-item" dmx-class:disabled="conn_todaySalesH.data.query.page.current ==  conn_todaySalesH.data.query.page.total" aria-label="Last">
+                            <a href="javascript:void(0)" class="page-link" dmx-on:click="query1.set('offset',conn_todaySalesH.data.query.page.offset.last)"><span aria-hidden="true">&rsaquo;&rsaquo;</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3 fade-in-down">
+        <div class="col">
+            <input id="text1" name="text1" type="date" class="form-control" dmx-show="select1.value==1" placeholder="Enter Date">
+            <input id="text2" name="text2" type="month" class="form-control" dmx-show="select1.value==2" placeholder="Enter Month">
+        </div>
+        <div class="col">
+            <select id="select1" class="form-select">
+                <option value="1">Filter by Day</option>
+                <option value="2">Filter by Month</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col mt-3 fade-in-down">
+            <p>Order Counts in Hours</p>
+            <dmx-chart id="chart1" dataset-1:value="total_orders" points="true" labels="'Hrs '+order_hour" smooth="true" thickness="3" dataset-1:label="Order Counts" label-y="conn_filteredSales.data.custom1.total_orders" width="300" height="150" dmx-bind:data="conn_filteredSales.data.custom1" dmx-hide="select1.value!=1" type="area"></dmx-chart>
+        </div>
+        <div class="col mt-3 fade-in-down">
+            <p>Order Counts Each Day of the Month</p>
+            <dmx-chart id="chart2" dataset-1:value="total_orders" points="true" labels="'Day '+order_day" smooth="true" thickness="3" dataset-1:label="Order Counts" width="300" height="150" type="area" responsive="true" dmx-bind:data="conn_filteredMonth.data.custom"></dmx-chart>
+        </div>
+    </div>
+</div>

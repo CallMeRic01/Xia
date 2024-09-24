@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "filter"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [
+            {
+              "table": "product",
+              "column": "pro_id",
+              "recid": 1
+            },
+            {
+              "table": "product",
+              "column": "pro_name",
+              "recid": 2
+            },
+            {
+              "table": "product",
+              "column": "pro_price",
+              "recid": 3
+            },
+            {
+              "table": "product",
+              "column": "pro_desc",
+              "recid": 4
+            },
+            {
+              "table": "product",
+              "column": "pro_stat",
+              "recid": 5
+            },
+            {
+              "table": "product",
+              "column": "pro_stock",
+              "recid": 6
+            },
+            {
+              "table": "product",
+              "column": "pro_image",
+              "recid": 7
+            }
+          ],
+          "params": [
+            {
+              "operator": "contains",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.filter}}",
+              "test": ""
+            }
+          ],
+          "table": {
+            "name": "product"
+          },
+          "primary": "pro_id",
+          "joins": [],
+          "query": "select `pro_id`, `pro_name`, `pro_price`, `pro_desc`, `pro_stat`, `pro_stock`, `pro_image` from `product` where `product`.`pro_name` like ?",
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "product.pro_name",
+                "field": "product.pro_name",
+                "type": "string",
+                "operator": "contains",
+                "value": "{{$_GET.filter}}",
+                "data": {
+                  "table": "product",
+                  "column": "pro_name",
+                  "type": "text",
+                  "columnObj": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "primary": false,
+                    "nullable": true,
+                    "name": "pro_name"
+                  }
+                },
+                "operation": "LIKE",
+                "table": "product"
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          }
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "pro_id"
+        },
+        {
+          "type": "text",
+          "name": "pro_name"
+        },
+        {
+          "type": "number",
+          "name": "pro_price"
+        },
+        {
+          "type": "text",
+          "name": "pro_desc"
+        },
+        {
+          "type": "boolean",
+          "name": "pro_stat"
+        },
+        {
+          "type": "number",
+          "name": "pro_stock"
+        },
+        {
+          "type": "text",
+          "name": "pro_image"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

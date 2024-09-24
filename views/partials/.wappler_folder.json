@@ -1,0 +1,9 @@
+{
+  "navbar.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "navigation.ejs": {
+    "description": ""
+  }
+}

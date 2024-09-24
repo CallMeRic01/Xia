@@ -1,0 +1,338 @@
+<!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="admin_order" appConnect="local" components="{dmxBootstrap5TableGenerator:{},dmxNotifications:{},dmxBootstrap5Modal:{},dmxFormRepeat:{},dmxDatastore:{},dmxFormatter:{},dmxBootstrap5Tooltips:{},dmxBootstrap5Popovers:{},dmxTyped:{},dmxBootstrap5Alert:{},dmxDatePicker:{},dmxGooglePlaces:{},dmxAutocomplete:{},dmxValidator:{},dmxBootbox5:{}}" jquery_slim_35="cdn" moment_2="cdn" -->
+<dmx-serverconnect id="conn_orderDetails" url="/api/admin/order/refundOrder" noload="true"></dmx-serverconnect>
+<dmx-serverconnect id="conn_viewOrder" url="/api/admin/order/viewOrder" noload="true"></dmx-serverconnect>
+<dmx-serverconnect id="conn_customerList" url="/api/admin/loyalty/customerList" dmx-param:cust_num="serverconnectform1.CustSearch.value" dmx-param:cust_name="serverconnectform1.CustSearch.value"></dmx-serverconnect>
+<dmx-serverconnect id="conn_totalSalesToday" url="/api/admin/sales/totalSalesToday"></dmx-serverconnect>
+<dmx-serverconnect id="conn_stockUpdate" url="/api/admin/order/updateStock"></dmx-serverconnect>
+<dmx-datastore id="cart" session="true"></dmx-datastore>
+<dmx-datetime id="currentTime"></dmx-datetime>
+<dmx-serverconnect id="conn_pullProduct" url="/api/admin/order/pullProduct"></dmx-serverconnect>
+<dmx-serverconnect id="conn_createOrder" url="/api/admin/order/createOrder" dmx-param:cust="serverconnectform1.CustomerSelect.value"></dmx-serverconnect>
+<dmx-notifications id="notifies1"></dmx-notifications>
+<dmx-variable id="insufficientStock" value="false"></dmx-variable>
+<dmx-variable id="totalSalesToday" value="0"></dmx-variable>
+<dmx-serverconnect id="conn_productsByDay" url="/api/admin/product/getProductsByDay" dmx-param:dayOfWeek="currentTime.datetime.formatDate('dddd')"></dmx-serverconnect>
+
+<meta name="ac:route" content="/admin_order">
+<%- await include('/partials/navbar', Object.assign({}, locals)) %>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6 col-md-12 product-list-scroll">
+            <h3 class="mb-3">Product List</h3>
+            <div class="row g-3">
+                <div class="col-6 col-md-4 col-lg-3 fade-in" dmx-repeat:product_list="conn_productsByDay.data.query">
+                    <div class="card small-card">
+                        <img class="card-img-top" dmx-bind:src="'/uploads/proImage/'+pro_image">
+                        <div class="card-body text-center">
+                            <h5 class="card-title" dmx-text="pro_name"></h5>
+                            <p class="card-text text-success">RM {{pro_price}}</p>
+                            <div class="d-grid gap-2 mb-2">
+                                <button class="btn btn-primary fw-bold" dmx-on:click="cart.upsert({pro_id: pro_id},{pro_name: pro_name, pro_id: pro_id, pro_price: pro_price, detOrd_quantity: 1, pro_stock: pro_stock})" dmx-hide="!pro_stat || pro_stock <= 0"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+                                <button class="btn btn-secondary fw-bold" dmx-bind:disabled="!pro_stat || pro_stock <= 0" dmx-show="!pro_stat || pro_stock <= 0">Unavailable</button>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-outline-danger btn-sm" dmx-on:click="cart.update({pro_id: pro_id},{detOrd_quantity: (cart.data.where('pro_id', pro_id).values('detOrd_quantity')[0] - 1)})" dmx-bind:disabled="cart.data.where('pro_id', pro_id).values('detOrd_quantity')[0] == 1"><i class="fas fa-minus"></i></button>
+                                <p>Quantity: {{cart.data.where('pro_id', pro_id).values('detOrd_quantity')[0]}}</p>
+                                <button class="btn btn-outline-success btn-sm" dmx-on:click="cart.update({pro_id: pro_id},{detOrd_quantity: (cart.data.where('pro_id', pro_id).values('detOrd_quantity')[0] + 1)})"><i class="fas fa-plus"></i></button>
+                                <button class="btn btn-outline-warning btn-sm" dmx-on:click="cart.delete({pro_id: pro_id})"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 mt-3 mt-lg-0">
+            <h3 class="visually-hidden">Cart</h3>
+            <form method="post" action="/api/admin/order/createOrder" dmx-on:success="notifies1.success('Order added successfully'); serverconnectform1.reset(); cart.clear(); conn_pullProduct.load({}); conn_customerList.load({})" dmx-on:error="notifies1.danger('Failed to submit order')" is="dmx-serverconnect-form" id="serverconnectform1">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Price (RM)</th>
+                                        <th>Quantity</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="cart.data" id="tableRepeat1">
+                                    <tr>
+                                        <td dmx-text="pro_name"></td>
+                                        <td dmx-text="pro_price"></td>
+                                        <td>
+                                            <input id="text1" name="pro_id[]" type="hidden" class="form-control" dmx-bind:value="pro_id">
+                                            <input id="text2" name="detOrd_quantity[]" type="hidden" class="form-control" dmx-bind:value="detOrd_quantity">
+                                            <span dmx-text="detOrd_quantity"></span>
+                                            <input id="text3" name="pro_stock[]" type="hidden" class="form-control" dmx-bind:value="pro_stock">
+                                            <dmx-variable id="insufficientStockCheck" dmx-bind:value="cart.data.values().filter(q => q.detOrd_quantity > q.pro_stock).length > 0"></dmx-variable>
+                                        </td>
+
+                                        <td>
+                                            <button class="btn btn-outline-danger btn-sm" dmx-on:click="cart.update({$id: $id},{detOrd_quantity: (detOrd_quantity - 1)})" dmx-bind:disabled="detOrd_quantity == 1"><i class="fas fa-minus"></i></button>
+                                            <button class="btn btn-outline-success btn-sm" dmx-on:click="cart.update({$id: $id},{detOrd_quantity: (detOrd_quantity + 1)})"><i class="fas fa-plus"></i></button>
+                                            <button class="btn btn-outline-warning btn-sm" dmx-on:click="cart.delete({$id: $id})"><i class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="alert alert-danger" dmx-show="cart.data.count() == 0 || (paymentMethod.value == 'Cash' &amp;&amp; (order_amountPaid.value - ((cart.data.sum(`(pro_price * detOrd_quantity)`)).round(2) * (1 - order_discount.value / 100) + takeawayFee.value)).round(2) < 0)">
+                            <p dmx-show="cart.data.count() == 0">The cart is empty. Please add products to the cart.</p>
+                            <p dmx-show="paymentMethod.value == 'Cash' &amp;&amp; (order_amountPaid.value - ((cart.data.sum(`(pro_price * detOrd_quantity)`)).round(2) * (1 - order_discount.value / 100) + takeawayFee.value)).round(2) < 0">Insufficient funds for cash payment.</p>
+                        </div>
+                    </div>
+
+
+                    <!-- Customer Search and Selection -->
+                    <div class="col-md-12">
+                        <div class="divider"></div>
+                        <div class="row">
+                            <h6><b>Customer List</b></h6>
+                            <div class="col">
+                                <input id="CustSearch" name="SearchCust" type="search" class="form-control" placeholder="Search customer name here">
+                            </div>
+                            <div class="col">
+
+                                <select id="CustomerSelect" class="form-select" dmx-bind:options="conn_customerList.data.query" optiontext="cust_name+' ('+cust_num+')'" optionvalue="cust_id" name="cust_id">
+                                    <option selected="" value="">Select or Enter Customer Name</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <button id="AddCust" class="btn btn-primary" dmx-on:click="CustomerReg.show()"><i class="fas fa-user-plus"></i></button>
+                            </div>
+                            <p><b>Loyalty Points: {{conn_customerList.data.query.where('cust_id', CustomerSelect.value).values('cust_loyalP')[0]}}</b><button id="btn4" class="btn btn-success mt-2 ms-4" dmx-on:click="pointsRedeem.MemberPointsRedeem.show()">Redeem Points</button></p>
+                        </div>
+                        <div class="divider"></div>
+                        <!-- Order Amount and Payment Details -->
+                        <input id="totalAmount" name="ord_totalAmount" dmx-bind:value="discountType.value == 'percent' ? 
+                                           ((cart.data.sum(`(pro_price * detOrd_quantity)`)) * (1 - order_discount.value / 100)).round(2) + takeawayFee.value : 
+                                           ((cart.data.sum(`(pro_price * detOrd_quantity)`)).round(2) - order_discount.value) + takeawayFee.value.round(2)" type="hidden">
+                        <input type="hidden" id="orderDateTime" name="ord_date" dmx-bind:value="currentTime.datetime">
+                        <input type="hidden" id="orderDateTime1" name="detOrd_date" dmx-bind:value="currentTime.datetime">
+                        <input id="changeAmount" name="ord_changeAmount" dmx-bind:value="paymentMethod.value == 'Cash' ? 
+                           (order_amountPaid.value - 
+                            (discountType.value == 'percent' ? 
+                             (cart.data.sum(`(pro_price * detOrd_quantity)`) * (1 - order_discount.value / 100)).round(2) + takeawayFee.value : 
+                             (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) - order_discount.value + takeawayFee.value.round(2)))) : 0" type="hidden">
+                        <div>
+                            <p><b>Total Amount</b>: RM {{discountType.value == 'percent'?(cart.data.sum(`(pro_price * detOrd_quantity)`) * (1 - order_discount.value / 100)).round(2) + takeawayFee.value:(cart.data.sum(`(pro_price * detOrd_quantity)`) - order_discount.value).round(2) + takeawayFee.value.round(2)}} </p>
+                        </div>
+                        <!-- Discount and Payment Method -->
+                        <div class="form-group">
+                            <label for="order_discount"><b>Discount:</b> </label>
+                            <div class="row">
+                                <div class="col"><input type="number" id="order_discount" class="form-control" dmx-bind:placeholder="discountType.value == 'percent' ? 'Enter % discount' : 'Enter RM discount'" name="ord_dis" dmx-on:focus="order_discount.setValue('')" value="0"></div>
+                                <div class="col-3"><select id="discountType" name="discountType" class="form-select">
+                                        <option value="percent">%</option>
+                                        <option value="amount">RM</option>
+                                    </select></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod"><b>Payment Method</b>: </label>
+                            <select id="paymentMethod" name="ord_payMethod" class="form-select">
+                                <option value="Cash">Cash</option>
+                                <option value="TnG">TnG</option>
+                                <option value="Grab">Grab</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="isTakeaway"><b>Takeaway</b>: </label>
+                            <input type="hidden" id="takeawayFee">
+                            <input type="checkbox" id="isTakeaway" name="ord_isTA" dmx-on:checked="isTakeaway.setValue(1)" dmx-on:changed="takeawayFee.setValue(isTakeaway.checked ? 0.20 : 0)">
+                            <label for="isTakeaway">Yes</label>
+                        </div>
+                        <div class="form-group">
+                            <label dmx-hide="paymentMethod.value == 'TnG' || paymentMethod.value == 'Grab'"><b>Amount Paid</b>: </label>
+                            <input type="number" id="order_amountPaid" name="ord_paidCash" class="form-control" dmx-bind:value="(paymentMethod.value == 'Cash' ? value : 0)" dmx-hide="paymentMethod.value == 'TnG' || paymentMethod.value == 'Grab'">
+                        </div>
+                        <div class="form-group">
+                            <label dmx-hide="paymentMethod.value == 'TnG' || paymentMethod.value == 'Grab'"><b>Change</b>: </label>
+                            <span dmx-show="(order_amountPaid.value - 
+                            (discountType.value == 'percent' ? 
+                            (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) * (1 - order_discount.value / 100)) + takeawayFee.value : 
+                            (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) - order_discount.value + takeawayFee.value.round(2)))) < 0 &amp;&amp; paymentMethod.value == 'Cash'"><b>Insufficient funds</b></span>
+                            <span dmx-show="(order_amountPaid.value - 
+                            (discountType.value == 'percent' ? 
+                            (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) * (1 - order_discount.value / 100)) + takeawayFee.value : 
+                            (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) - order_discount.value + takeawayFee.value.round(2))))>= 0">{{(order_amountPaid.value - (discountType.value == 'percent' ? (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) * (1 - order_discount.value / 100)) + takeawayFee.value :(cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) - order_discount.value + takeawayFee.value.round(2))))}}</span>
+                        </div>
+                        <button class="btn btn-success mt-3 w-100" type="submit" dmx-bind:disabled="cart.data.count()==0 || insufficientStock.value || 
+                                (paymentMethod.value == 'Cash' &amp;&amp; 
+                                (order_amountPaid.value - 
+                                (discountType.value == 'percent' ? 
+                                ((cart.data.sum(`(pro_price * detOrd_quantity)`)).round(2) * (1 - order_discount.value / 100)) + takeawayFee.value : 
+                                ((cart.data.sum(`(pro_price * detOrd_quantity)`)).round(2) - order_discount.value) + takeawayFee.value.round(2))).round(2) < 0)">
+                            Submit Order
+                        </button>
+                        <button id="btn3" class="btn mt-3 w-100 btn-outline-danger" dmx-on:click="RefundModal.show();conn_totalSalesToday.load({});conn_viewOrder.load({})">Refund</button>
+                        <div class="alert alert-danger mt-3" dmx-show="tableRepeat1[0].detOrd_quantity > tableRepeat1[0].pro_stock" id="InsufficientStock">Insufficient stock for one or more products in the cart.</div>
+                    </div>
+                    <div class="col-md-12 text-center mt-3">
+                        <h3>{{currentTime.datetime.formatDate('dd-MM-yyyy | HH:mm:ss')}}</h3>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modals for Customer Registration and Closing -->
+    <div class="row">
+        <div class="modal" id="CustomerReg" is="dmx-bs5-modal" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Customer Information</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="CustReg" method="post" is="dmx-serverconnect-form" dmx-on:success="notifies1.success('Registered Successfully');CustReg.reset();CustomerReg.hide();conn_customerList.load({})" action="/api/admin/loyalty/customerReg">
+                            <div class="row">
+                                <div class="col">
+                                    <p>Name:</p>
+                                    <input id="customer_name" name="cust_name" type="text" class="form-control mb-2" required="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <p>Email:</p>
+                                    <input id="customer_email" name="cust_email" type="email" class="form-control mb-2" required="" data-rule-email="">
+                                </div>
+                                <div class="col">
+                                    <p>Phone Number:</p>
+                                    <input id="customer_number" name="cust_num" class="form-control" required="">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>Date of Birth:&nbsp;</p>
+                                    <input id="customerDOB" name="cust_dob" is="dmx-date-picker" format="MM-DD-YYYY" required="">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary mt-3 w-100" type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Closing Modal -->
+        <div class="modal" id="RefundModal" is="dmx-bs5-modal" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Refund</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered table-hover table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Ord</th>
+                                                <th>Product names</th>
+                                                <th>Total quantity</th>
+                                                <th>Total price</th>
+                                                <th>Det ord date</th>
+                                                <th>Cust</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_viewOrder.data.query" id="tableRepeat2">
+                                            <tr>
+                                                <td dmx-text="ord_id" dmx-on:click="conn_orderDetails.load({ord_id: ord_id});Refunding.editOrder.show()"></td>
+                                                <td dmx-text="product_names"></td>
+                                                <td dmx-text="total_quantity"></td>
+                                                <td dmx-text="total_price"></td>
+                                                <td dmx-text="detOrd_date.formatDate('dd-MM-yyyy | HH:mm:ss')"></td>
+                                                <td dmx-text="cust_id"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Points Redeem Modal -->
+        <form id="Refunding" method="post">
+            <div class="modal" id="editOrder" is="dmx-bs5-modal" tabindex="-1">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Order ID: {{conn_orderDetails.data.custom[0].ord_id}}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Total Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_orderDetails.data.custom" id="tableRepeat4">
+                                        <tr>
+                                            <td dmx-text="pro_id"></td>
+                                            <td dmx-text="pro_name"></td>
+                                            <td dmx-text="pro_price"></td>
+                                            <td dmx-text="detOrd_quantity"></td>
+                                            <td dmx-text="pro_price*detOrd_quantity"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+        <form id="pointsRedeem" method="post" is="dmx-serverconnect-form" action="/api/admin/loyalty/redeemPoints" dmx-on:success="notifies1.success('Redeemed Successfully!');conn_customerList.load({});conn_createOrder.load({});MemberPointsRedeem.hide();pointsRedeem.reset()" dmx-on:error="notifies1.warning('Error! Please check your input.')">
+            <div class="modal" id="MemberPointsRedeem" is="dmx-bs5-modal" tabindex="-1">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Customer Name: {{serverconnectform1.CustomerSelect.selectedText}}</h5>
+                            <input id="customerRdpID" name="cust_id" class="form-control" dmx-bind:value="serverconnectform1.CustomerSelect.selectedValue" type="hidden">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Loyalty Points: {{conn_customerList.data.query.where('cust_id', serverconnectform1.CustomerSelect.value).values('cust_loyalP')[0]}}</p>
+                            <p>Able to redeem: {{((conn_customerList.data.query.where('cust_id', serverconnectform1.CustomerSelect.value).values('cust_loyalP')[0])/9).floor()}}</p>
+                            <div class="row">
+                                <div class="col">
+                                    <input id="pointsRdp" name="pRedeemed" type="range" class="form-control" dmx-bind:max="((conn_customerList.data.query.where('cust_id', serverconnectform1.CustomerSelect.value).values('cust_loyalP')[0])/9).floor()" min="1">
+                                </div>
+                                <div class="col-2">
+                                    <p>{{pointsRdp.value}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="submit">Redeem</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

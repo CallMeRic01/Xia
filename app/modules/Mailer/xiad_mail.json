@@ -1,0 +1,12 @@
+{
+  "name": "xiad_mail",
+  "module": "mail",
+  "action": "setup",
+  "options": {
+    "username": "noreply@xiadessert.fundingproexpert.com",
+    "password": "123!@#qwerty",
+    "host": "xiadessert.fundingproexpert.com",
+    "port": 465,
+    "useSSL": true
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_order.ejs",
+      "linkedForm": "CustReg"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "cust_name",
+        "name": "cust_name"
+      },
+      {
+        "type": "text",
+        "fieldName": "cust_email",
+        "options": {
+          "rules": {
+            "core:email": {}
+          }
+        },
+        "name": "cust_email"
+      },
+      {
+        "type": "text",
+        "fieldName": "cust_num",
+        "name": "cust_num"
+      },
+      {
+        "type": "text",
+        "fieldName": "cust_dob",
+        "name": "cust_dob"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "validate",
+        "module": "validator",
+        "action": "validate",
+        "options": {
+          "data": [
+            {
+              "name": "validate_1",
+              "value": "{{$_POST.cust_email}}",
+              "rules": {
+                "db:notexists": {
+                  "param": {
+                    "connection": "db",
+                    "table": "customer",
+                    "column": "cust_email"
+                  },
+                  "message": "Customer already registered!"
+                }
+              },
+              "fieldName": "cust_email"
+            }
+          ]
+        }
+      },
+      {
+        "name": "insert",
+        "module": "dbupdater",
+        "action": "insert",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "insert",
+            "values": [
+              {
+                "table": "customer",
+                "column": "cust_name",
+                "type": "text",
+                "value": "{{$_POST.cust_name}}",
+                "recid": 1
+              },
+              {
+                "table": "customer",
+                "column": "cust_num",
+                "type": "text",
+                "value": "{{$_POST.cust_num}}",
+                "recid": 2
+              },
+              {
+                "table": "customer",
+                "column": "cust_email",
+                "type": "text",
+                "value": "{{$_POST.cust_email}}",
+                "recid": 3
+              },
+              {
+                "table": "customer",
+                "column": "cust_dob",
+                "type": "date",
+                "value": "{{$_POST.cust_dob}}",
+                "recid": 4
+              }
+            ],
+            "table": "customer",
+            "returning": "cust_id",
+            "query": "insert into `customer` (`cust_dob`, `cust_email`, `cust_name`, `cust_num`) values (?, ?, ?, ?)",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.cust_name}}",
+                "test": ""
+              },
+              {
+                "name": ":P2",
+                "type": "expression",
+                "value": "{{$_POST.cust_num}}",
+                "test": ""
+              },
+              {
+                "name": ":P3",
+                "type": "expression",
+                "value": "{{$_POST.cust_email}}",
+                "test": ""
+              },
+              {
+                "name": ":P4",
+                "type": "expression",
+                "value": "{{$_POST.cust_dob}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          },
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  }
+}

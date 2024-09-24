@@ -1,0 +1,366 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/partials/navbar.ejs",
+      "linkedForm": "clockInOut"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "array",
+        "fieldName": "cIO_in[]",
+        "multiple": true,
+        "name": "cIO_in"
+      },
+      {
+        "type": "array",
+        "fieldName": "user_id[]",
+        "multiple": true,
+        "name": "user_id"
+      },
+      {
+        "type": "array",
+        "fieldName": "cIO_out[]",
+        "multiple": true,
+        "name": "cIO_out"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_id2",
+        "name": "user_id2"
+      },
+      {
+        "type": "array",
+        "name": "record",
+        "sub": [
+          {
+            "type": "datetime",
+            "name": "g_clockIn"
+          },
+          {
+            "type": "number",
+            "name": "g_user"
+          },
+          {
+            "type": "date",
+            "name": "CURDATE()"
+          },
+          {
+            "type": "datetime",
+            "name": "g_clockOut"
+          },
+          {
+            "type": "number",
+            "name": "user"
+          },
+          {
+            "type": "datetime",
+            "name": "g_cIO_out"
+          },
+          {
+            "type": "date",
+            "name": "NOW"
+          },
+          {
+            "type": "datetime",
+            "name": "g_hrsWorked"
+          }
+        ]
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{NOW.formatDate('yyyy-MM-dd', false)}}",
+                "test": "2024-9-6"
+              }
+            ],
+            "table": {
+              "name": "user_clockInOut"
+            },
+            "primary": "cIO_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user_clockInOut.cIO_date",
+                  "field": "user_clockInOut.cIO_date",
+                  "type": "date",
+                  "operator": "equal",
+                  "value": "{{NOW.formatDate('yyyy-MM-dd', false)}}",
+                  "data": {
+                    "table": "user_clockInOut",
+                    "column": "cIO_date",
+                    "type": "date",
+                    "columnObj": {
+                      "type": "date",
+                      "primary": false,
+                      "nullable": true,
+                      "name": "cIO_date"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "user_clockInOut"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select * from `user_clockInOut` where `user_clockInOut`.`cIO_date` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "number",
+            "name": "cIO_id"
+          },
+          {
+            "type": "datetime",
+            "name": "cIO_in"
+          },
+          {
+            "type": "datetime",
+            "name": "cIO_out"
+          },
+          {
+            "type": "number",
+            "name": "user_id"
+          },
+          {
+            "type": "date",
+            "name": "cIO_date"
+          },
+          {
+            "type": "time",
+            "name": "cIO_hrsWorked"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{query>0}}",
+          "then": {
+            "steps": {
+              "name": "Repeat",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 401,
+                "data": "Record existed for today"
+              }
+            }
+          },
+          "else": {
+            "steps": {
+              "name": "repeat",
+              "module": "core",
+              "action": "repeat",
+              "options": {
+                "repeat": "{{$_POST.user_id}}",
+                "outputFields": [],
+                "exec": {
+                  "steps": [
+                    {
+                      "name": "clockIn",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "g_clockIn",
+                        "value": "{{$_POST.cIO_in[$index].formatDate('yyyy-MM-dd HH:mm:ss', false)}}",
+                        "schema": []
+                      },
+                      "meta": [],
+                      "outputType": "array"
+                    },
+                    {
+                      "name": "user",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "g_user",
+                        "value": "{{$_POST.user_id[$index]}}"
+                      },
+                      "meta": [],
+                      "outputType": "array"
+                    },
+                    {
+                      "name": "clockOut",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "g_clockOut",
+                        "value": "{{$_POST.cIO_out[$index].formatDate('yyyy-MM-dd HH:mm:ss', false)}}"
+                      },
+                      "meta": [],
+                      "outputType": "array"
+                    },
+                    {
+                      "name": "hrsWorked",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "g_hrsWorked",
+                        "value": "{{clockOut.dateDiff('hours:minutes', clockIn)}}"
+                      },
+                      "meta": [],
+                      "outputType": "time",
+                      "output": true
+                    },
+                    {
+                      "name": "insert1",
+                      "module": "dbupdater",
+                      "action": "insert",
+                      "options": {
+                        "connection": "db",
+                        "sql": {
+                          "type": "insert",
+                          "values": [
+                            {
+                              "table": "user_clockInOut",
+                              "column": "cIO_in",
+                              "type": "datetime",
+                              "value": "{{g_clockIn}}",
+                              "recid": 1
+                            },
+                            {
+                              "table": "user_clockInOut",
+                              "column": "cIO_out",
+                              "type": "datetime",
+                              "value": "{{g_clockOut}}",
+                              "recid": 2
+                            },
+                            {
+                              "table": "user_clockInOut",
+                              "column": "user_id",
+                              "type": "number",
+                              "value": "{{g_user}}",
+                              "recid": 3
+                            },
+                            {
+                              "table": "user_clockInOut",
+                              "column": "cIO_date",
+                              "type": "date",
+                              "value": "{{NOW.formatDate('yyyy-MM-dd', false)}}",
+                              "recid": 4
+                            },
+                            {
+                              "table": "user_clockInOut",
+                              "column": "cIO_hrsWorked",
+                              "type": "time",
+                              "value": "{{g_hrsWorked}}",
+                              "recid": 5
+                            }
+                          ],
+                          "table": "user_clockInOut",
+                          "returning": "cIO_id",
+                          "query": "insert into `user_clockInOut` (`cIO_date`, `cIO_hrsWorked`, `cIO_in`, `cIO_out`, `user_id`) values (?, ?, ?, ?, ?)",
+                          "params": [
+                            {
+                              "name": ":P1",
+                              "type": "expression",
+                              "value": "{{g_clockIn}}",
+                              "test": ""
+                            },
+                            {
+                              "name": ":P2",
+                              "type": "expression",
+                              "value": "{{g_clockOut}}",
+                              "test": ""
+                            },
+                            {
+                              "name": ":P3",
+                              "type": "expression",
+                              "value": "{{g_user}}",
+                              "test": ""
+                            },
+                            {
+                              "name": ":P4",
+                              "type": "expression",
+                              "value": "{{NOW.formatDate('yyyy-MM-dd', false)}}",
+                              "test": ""
+                            },
+                            {
+                              "name": ":P5",
+                              "type": "expression",
+                              "value": "{{g_hrsWorked}}",
+                              "test": ""
+                            }
+                          ]
+                        }
+                      },
+                      "meta": [
+                        {
+                          "name": "identity",
+                          "type": "text"
+                        },
+                        {
+                          "name": "affected",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "$index",
+                  "type": "number"
+                },
+                {
+                  "name": "$number",
+                  "type": "number"
+                },
+                {
+                  "name": "$name",
+                  "type": "text"
+                },
+                {
+                  "name": "$value",
+                  "type": "object"
+                },
+                {
+                  "name": "hrsWorked",
+                  "type": "time",
+                  "sub": []
+                }
+              ],
+              "outputType": "array"
+            }
+          }
+        },
+        "outputType": "boolean"
+      }
+    ]
+  }
+}

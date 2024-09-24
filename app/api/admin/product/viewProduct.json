@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "pro_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "single",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [
+            {
+              "table": "product",
+              "column": "pro_id"
+            },
+            {
+              "table": "product",
+              "column": "pro_name"
+            },
+            {
+              "table": "product",
+              "column": "pro_price"
+            },
+            {
+              "table": "product",
+              "column": "pro_image"
+            },
+            {
+              "table": "product",
+              "column": "pro_desc"
+            },
+            {
+              "table": "product",
+              "column": "pro_stat"
+            },
+            {
+              "table": "product",
+              "column": "pro_stock"
+            }
+          ],
+          "params": [
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.pro_id}}",
+              "test": ""
+            }
+          ],
+          "table": {
+            "name": "product"
+          },
+          "primary": "pro_id",
+          "joins": [],
+          "query": "select `pro_id`, `pro_name`, `pro_price`, `pro_image`, `pro_desc`, `pro_stat`, `pro_stock` from `product` where `product`.`pro_id` = ?",
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "product.pro_id",
+                "field": "product.pro_id",
+                "type": "double",
+                "operator": "equal",
+                "value": "{{$_GET.pro_id}}",
+                "data": {
+                  "table": "product",
+                  "column": "pro_id",
+                  "type": "number",
+                  "columnObj": {
+                    "type": "increments",
+                    "primary": true,
+                    "nullable": false,
+                    "name": "pro_id"
+                  }
+                },
+                "operation": "=",
+                "table": "product"
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          }
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "pro_id"
+        },
+        {
+          "type": "text",
+          "name": "pro_name"
+        },
+        {
+          "type": "number",
+          "name": "pro_price"
+        },
+        {
+          "type": "text",
+          "name": "pro_image"
+        },
+        {
+          "type": "text",
+          "name": "pro_desc"
+        },
+        {
+          "type": "boolean",
+          "name": "pro_stat"
+        },
+        {
+          "type": "number",
+          "name": "pro_stock"
+        }
+      ],
+      "outputType": "object"
+    }
+  }
+}

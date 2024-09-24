@@ -1,0 +1,47 @@
+<!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="accountValidation" appconnect="local" components="{dmxValidator:{},dmxNotifications:{},dmxBrowser:{}}" -->
+<dmx-serverconnect id="serverconnect1" url="/api/registration/validation"></dmx-serverconnect>
+<dmx-serverconnect id="conn_resend" url="/api/registration/resendCode"></dmx-serverconnect>
+<dmx-notifications id="notifies1">
+
+</dmx-notifications>
+<div is="dmx-browser" id="browser1"></div>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Account Validation</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xxl-4">
+            <p>Validate Account by Entering the Code {{conn_resend.data.identity}}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <form id="form1" is="dmx-serverconnect-form" method="post" action="/api/registration/validation" dmx-on:unauthorized="notifies1.warning('Unauthorized')" dmx-on:error="notifies1.danger('Error')" dmx-on:success="browser1.goto('/admin_order')">
+                <div class="form-group mb-3 row">
+                    <label for="user_authCode1" class="col-sm-2 col-form-label">Validation Code</label>
+                    <div class="col-sm-10 col-xxl-3">
+                        <input class="form-control" id="user_authCode1" name="user_authCode" aria-describedby="input1_help" placeholder="Enter your validation code here" required="">
+                    </div>
+                </div>
+                <div class="form-group mb-3 row">
+                    <label for="input2" class="col-sm-2 col-form-label">Registered Email</label>
+                    <div class="col-sm-10 col-xxl-3">
+                        <input type="email" class="form-control" id="input2" name="user_email" aria-describedby="input1_help" placeholder="Enter your registered email here" required="" data-rule-email="">
+                    </div>
+                </div>
+                <div class="form-group mb-3 row">
+                    <div class="col-sm-3">
+                        <button id="btn1_submit" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                    <div class="col-sm-4">
+                        <button id="btn1" class="btn text-light text-bg-danger" dmx-on:click="run([{serverConnect:{name:'sc',outputType:'object',url:'/api/registration/resendCode',site:'XiaD'}},{run:{outputType:'text',disabled:true,action:`conn_resend.load({})`}},{run:{outputType:'text',action:`notifies1.success(conn_resend.data.query.user_authCode+conn_resend.data.identity+\'Code Sent \')`}}])">Resend Code</button>&nbsp;
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<meta name="ac:route" content="/accountValidation">

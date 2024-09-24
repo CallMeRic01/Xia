@@ -1,0 +1,121 @@
+[
+  {
+    "name": "identity",
+    "module": "auth",
+    "action": "identify",
+    "options": {
+      "provider": "xiaD"
+    },
+    "output": true,
+    "meta": []
+  },
+  {
+    "name": "queryResend",
+    "module": "dbconnector",
+    "action": "single",
+    "options": {
+      "connection": "db",
+      "sql": {
+        "type": "select",
+        "columns": [
+          {
+            "table": "user",
+            "column": "user_firstName",
+            "recid": 1
+          },
+          {
+            "table": "user",
+            "column": "user_lastName",
+            "recid": 2
+          },
+          {
+            "table": "user",
+            "column": "user_email",
+            "recid": 3
+          },
+          {
+            "table": "user",
+            "column": "user_authCode",
+            "recid": 4
+          }
+        ],
+        "params": [
+          {
+            "operator": "equal",
+            "type": "expression",
+            "name": ":P1",
+            "value": "{{identity}}",
+            "test": ""
+          }
+        ],
+        "table": {
+          "name": "user"
+        },
+        "primary": "user_id",
+        "joins": [],
+        "wheres": {
+          "condition": "AND",
+          "rules": [
+            {
+              "id": "user.user_id",
+              "field": "user.user_id",
+              "type": "double",
+              "operator": "equal",
+              "value": "{{identity}}",
+              "data": {
+                "table": "user",
+                "column": "user_id",
+                "type": "number",
+                "columnObj": {
+                  "type": "increments",
+                  "primary": true,
+                  "unique": false,
+                  "nullable": false,
+                  "name": "user_id"
+                }
+              },
+              "operation": "=",
+              "table": "user"
+            }
+          ],
+          "conditional": null,
+          "valid": true
+        },
+        "query": "select `user_firstName`, `user_lastName`, `user_email`, `user_authCode` from `user` where `user`.`user_id` = ?"
+      }
+    },
+    "meta": [
+      {
+        "type": "text",
+        "name": "user_firstName"
+      },
+      {
+        "type": "text",
+        "name": "user_lastName"
+      },
+      {
+        "type": "text",
+        "name": "user_email"
+      },
+      {
+        "type": "text",
+        "name": "user_authCode"
+      }
+    ],
+    "outputType": "object"
+  },
+  {
+    "name": "",
+    "module": "mail",
+    "action": "send",
+    "options": {
+      "instance": "mail",
+      "subject": "Your Code",
+      "fromName": "Website",
+      "fromEmail": "eric.lim@triwind.net",
+      "toName": "{{queryResend.user_firstName}}",
+      "toEmail": "{{queryResend.user_email}}",
+      "body": "{{queryResend.user_authCode}}"
+    }
+  }
+]

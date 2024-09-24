@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "pro_id"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "pro_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "delete",
+      "module": "dbupdater",
+      "action": "delete",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "delete",
+          "table": "product",
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "pro_id",
+                "field": "pro_id",
+                "type": "double",
+                "operator": "equal",
+                "value": "{{$_GET.pro_id}}",
+                "data": {
+                  "column": "pro_id"
+                },
+                "operation": "="
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          },
+          "returning": "pro_id",
+          "query": "delete from `product` where `pro_id` = ?",
+          "params": [
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.pro_id}}",
+              "test": ""
+            }
+          ]
+        }
+      },
+      "meta": [
+        {
+          "name": "affected",
+          "type": "number"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,94 @@
+[
+  {
+    "name": "identity",
+    "module": "auth",
+    "action": "identify",
+    "options": {
+      "provider": "xiaD"
+    },
+    "output": true,
+    "meta": []
+  },
+  {
+    "name": "query",
+    "module": "dbconnector",
+    "action": "single",
+    "options": {
+      "connection": "db",
+      "sql": {
+        "type": "select",
+        "columns": [
+          {
+            "table": "user",
+            "column": "user_firstName"
+          },
+          {
+            "table": "user",
+            "column": "user_lastName"
+          },
+          {
+            "table": "user",
+            "column": "user_email"
+          }
+        ],
+        "params": [
+          {
+            "operator": "equal",
+            "type": "expression",
+            "name": ":P1",
+            "value": "{{identity}}",
+            "test": ""
+          }
+        ],
+        "table": {
+          "name": "user"
+        },
+        "primary": "user_id",
+        "joins": [],
+        "wheres": {
+          "condition": "AND",
+          "rules": [
+            {
+              "id": "user.user_id",
+              "field": "user.user_id",
+              "type": "double",
+              "operator": "equal",
+              "value": "{{identity}}",
+              "data": {
+                "table": "user",
+                "column": "user_id",
+                "type": "number",
+                "columnObj": {
+                  "type": "increments",
+                  "primary": true,
+                  "nullable": false,
+                  "name": "user_id"
+                }
+              },
+              "operation": "="
+            }
+          ],
+          "conditional": null,
+          "valid": true
+        },
+        "query": "select `user_firstName`, `user_lastName`, `user_email` from `user` where `user`.`user_id` = ?"
+      }
+    },
+    "output": true,
+    "meta": [
+      {
+        "type": "text",
+        "name": "user_firstName"
+      },
+      {
+        "type": "text",
+        "name": "user_lastName"
+      },
+      {
+        "type": "text",
+        "name": "user_email"
+      }
+    ],
+    "outputType": "object"
+  }
+]

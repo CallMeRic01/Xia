@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_staffManagement.ejs",
+      "linkedForm": "form1"
+    },
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "user_email",
+        "options": {
+          "rules": {
+            "core:email": {}
+          }
+        },
+        "name": "user_email"
+      },
+      {
+        "type": "text",
+        "fieldName": "role_id",
+        "name": "role_id"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_id",
+        "name": "user_id"
+      },
+      {
+        "type": "text",
+        "fieldName": "role",
+        "name": "role"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "update",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "role",
+                "column": "role",
+                "type": "text",
+                "value": "{{$_POST.role}}",
+                "recid": 1
+              }
+            ],
+            "table": "role",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "role_id",
+                  "field": "role_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.role_id}}",
+                  "data": {
+                    "column": "role_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "role_id",
+            "query": "update `role` set `role` = ? where `role_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.role}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{$_POST.role_id}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true
+      },
+      {
+        "name": "update1",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "user",
+                "column": "user_email",
+                "type": "text",
+                "value": "{{$_POST.user_email}}"
+              }
+            ],
+            "table": "user",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user_id",
+                  "field": "user_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{update.affected}}",
+                  "data": {
+                    "column": "user_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "user_id",
+            "query": "update `user` set `user_email` = ? where `user_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.user_email}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{update.affected}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true,
+        "disabled": true
+      }
+    ]
+  }
+}

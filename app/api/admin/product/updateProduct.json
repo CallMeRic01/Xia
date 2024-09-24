@@ -1,0 +1,312 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_product.ejs",
+      "linkedForm": "serverconnectform1"
+    },
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "pro_id",
+        "name": "pro_id"
+      },
+      {
+        "type": "text",
+        "fieldName": "pro_name",
+        "name": "pro_name"
+      },
+      {
+        "type": "number",
+        "fieldName": "pro_price",
+        "options": {
+          "rules": {
+            "core:number": {}
+          }
+        },
+        "name": "pro_price"
+      },
+      {
+        "type": "number",
+        "fieldName": "pro_stock",
+        "options": {
+          "rules": {
+            "core:number": {}
+          }
+        },
+        "name": "pro_stock"
+      },
+      {
+        "type": "file",
+        "fieldName": "pro_image",
+        "name": "pro_image",
+        "sub": [
+          {
+            "type": "text",
+            "name": "name"
+          },
+          {
+            "type": "text",
+            "name": "type"
+          },
+          {
+            "type": "number",
+            "name": "size"
+          },
+          {
+            "type": "text",
+            "name": "error"
+          }
+        ],
+        "outputType": "file"
+      },
+      {
+        "type": "text",
+        "fieldName": "pro_desc",
+        "name": "pro_desc"
+      },
+      {
+        "type": "text",
+        "fieldName": "pro_stat",
+        "name": "pro_stat"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "upload",
+        "module": "upload",
+        "action": "upload",
+        "options": {
+          "fields": "{{$_POST.pro_image}}",
+          "path": "/public/uploads/proImage/{{$_POST.pro_image.name}}",
+          "replaceSpace": true,
+          "replaceDiacritics": true,
+          "throwErrors": true,
+          "asciiOnly": true
+        },
+        "meta": [
+          {
+            "name": "name",
+            "type": "text"
+          },
+          {
+            "name": "path",
+            "type": "text"
+          },
+          {
+            "name": "url",
+            "type": "text"
+          },
+          {
+            "name": "type",
+            "type": "text"
+          },
+          {
+            "name": "size",
+            "type": "text"
+          },
+          {
+            "name": "error",
+            "type": "number"
+          }
+        ],
+        "outputType": "file",
+        "output": true
+      },
+      {
+        "name": "image",
+        "module": "image",
+        "action": "load",
+        "options": {
+          "path": "{{upload[0].path}}"
+        },
+        "outputType": "object",
+        "meta": [
+          {
+            "name": "width",
+            "type": "number"
+          },
+          {
+            "name": "height",
+            "type": "number"
+          }
+        ],
+        "disabled": true
+      },
+      {
+        "name": "",
+        "module": "image",
+        "action": "resize",
+        "options": {
+          "instance": "image",
+          "width": 640
+        },
+        "disabled": true
+      },
+      {
+        "name": "newImage",
+        "module": "image",
+        "action": "save",
+        "options": {
+          "instance": "image",
+          "path": "/public/uploads/proImage/{{$_POST.pro_id}}/full",
+          "quality": ""
+        },
+        "output": true,
+        "disabled": true
+      },
+      {
+        "name": "",
+        "module": "image",
+        "action": "cover",
+        "options": {
+          "instance": "image",
+          "width": 160,
+          "height": 80
+        },
+        "disabled": true
+      },
+      {
+        "name": "newImage1",
+        "module": "image",
+        "action": "save",
+        "options": {
+          "instance": "image",
+          "path": "/public/uploads/proImage/{{$_POST.pro_id}}/cover",
+          "quality": ""
+        },
+        "output": true,
+        "disabled": true
+      },
+      {
+        "name": "update",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "product",
+                "column": "pro_name",
+                "type": "text",
+                "value": "{{$_POST.pro_name}}",
+                "recid": 1
+              },
+              {
+                "table": "product",
+                "column": "pro_price",
+                "type": "number",
+                "value": "{{$_POST.pro_price}}",
+                "recid": 2
+              },
+              {
+                "table": "product",
+                "column": "pro_image",
+                "type": "text",
+                "value": "{{upload.name}}",
+                "recid": 3
+              },
+              {
+                "table": "product",
+                "column": "pro_desc",
+                "type": "text",
+                "value": "{{$_POST.pro_desc}}",
+                "recid": 4
+              },
+              {
+                "table": "product",
+                "column": "pro_stat",
+                "type": "boolean",
+                "value": "{{$_POST.pro_stat.default(0)}}",
+                "recid": 5
+              },
+              {
+                "table": "product",
+                "column": "pro_stock",
+                "type": "number",
+                "value": "{{$_POST.pro_stock}}",
+                "recid": 6
+              }
+            ],
+            "table": "product",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "pro_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.pro_id}}",
+                  "data": {
+                    "column": "pro_id"
+                  },
+                  "operation": "="
+                }
+              ]
+            },
+            "returning": "pro_id",
+            "query": "update `product` set `pro_name` = ?, `pro_price` = ?, `pro_image` = ?, `pro_desc` = ?, `pro_stat` = ?, `pro_stock` = ? where `pro_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.pro_name}}",
+                "test": ""
+              },
+              {
+                "name": ":P2",
+                "type": "expression",
+                "value": "{{$_POST.pro_price}}",
+                "test": ""
+              },
+              {
+                "name": ":P3",
+                "type": "expression",
+                "value": "{{upload.name}}",
+                "test": ""
+              },
+              {
+                "name": ":P4",
+                "type": "expression",
+                "value": "{{$_POST.pro_desc}}",
+                "test": ""
+              },
+              {
+                "name": ":P5",
+                "type": "expression",
+                "value": "{{$_POST.pro_stat.default(0)}}",
+                "test": ""
+              },
+              {
+                "name": ":P6",
+                "type": "expression",
+                "value": "{{$_POST.pro_stock}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P7",
+                "value": "{{$_POST.pro_id}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true
+      }
+    ]
+  },
+  "usedModules": {
+    "sharp": "^0.29.3"
+  }
+}

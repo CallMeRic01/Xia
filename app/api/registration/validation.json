@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/accountValidation.ejs",
+      "linkedForm": "form1"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "user_authCode",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_authCode"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_email",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:email": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_email"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "identify",
+        "options": {
+          "provider": "xiaD"
+        },
+        "output": true,
+        "meta": []
+      },
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "user",
+                "column": "user_authCode"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.user_email}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "user"
+            },
+            "primary": "user_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user.user_email",
+                  "field": "user.user_email",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.user_email}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_email",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "nullable": true,
+                      "name": "user_email"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `user_authCode` from `user` where `user`.`user_email` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "text",
+            "name": "user_authCode"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "query1",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "user",
+                "column": "user_id"
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.user_email}}",
+                "test": "ericlim0110@gmail.com"
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{query.user_authCode}}",
+                "test": "783592"
+              }
+            ],
+            "table": {
+              "name": "user"
+            },
+            "primary": "user_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user.user_email",
+                  "field": "user.user_email",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.user_email}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_email",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "nullable": true,
+                      "name": "user_email"
+                    }
+                  },
+                  "operation": "="
+                },
+                {
+                  "id": "user.user_authCode",
+                  "field": "user.user_authCode",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{query.user_authCode}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_authCode",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "nullable": true,
+                      "name": "user_authCode"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `user_id` from `user` where `user`.`user_email` = ? and `user`.`user_authCode` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "number",
+            "name": "user_id"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{query1}}",
+          "then": {
+            "steps": [
+              {
+                "name": "update",
+                "module": "dbupdater",
+                "action": "update",
+                "options": {
+                  "connection": "db",
+                  "sql": {
+                    "type": "update",
+                    "values": [
+                      {
+                        "table": "user",
+                        "column": "user_authCode",
+                        "type": "text",
+                        "value": "",
+                        "recid": 1
+                      },
+                      {
+                        "table": "user",
+                        "column": "user_validated",
+                        "type": "datetime",
+                        "value": "{{NOW}}",
+                        "recid": 2
+                      }
+                    ],
+                    "table": "user",
+                    "wheres": {
+                      "condition": "AND",
+                      "rules": [
+                        {
+                          "id": "user_id",
+                          "field": "user_id",
+                          "type": "double",
+                          "operator": "equal",
+                          "value": "{{query1.user_id}}",
+                          "data": {
+                            "column": "user_id"
+                          },
+                          "operation": "="
+                        }
+                      ],
+                      "conditional": null,
+                      "valid": true
+                    },
+                    "returning": "user_id",
+                    "query": "update `user` set `user_authCode` = ?, `user_validated` = ? where `user_id` = ?",
+                    "params": [
+                      {
+                        "name": ":P1",
+                        "type": "expression",
+                        "value": "{{NOW}}",
+                        "test": ""
+                      },
+                      {
+                        "operator": "equal",
+                        "type": "expression",
+                        "name": ":P2",
+                        "value": "{{query1.user_id}}",
+                        "test": ""
+                      }
+                    ]
+                  }
+                },
+                "meta": [
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "output": true
+              },
+              {
+                "name": "insert",
+                "module": "dbupdater",
+                "action": "insert",
+                "options": {
+                  "connection": "db",
+                  "sql": {
+                    "type": "insert",
+                    "values": [
+                      {
+                        "table": "role",
+                        "column": "role",
+                        "type": "text",
+                        "value": "M",
+                        "recid": 1
+                      },
+                      {
+                        "table": "role",
+                        "column": "user_id",
+                        "type": "text",
+                        "value": "{{query1.user_id}}",
+                        "recid": 2
+                      }
+                    ],
+                    "table": "role",
+                    "returning": "role_id",
+                    "query": "insert into `role` (`role`, `user_id`) values (?, ?)",
+                    "params": [
+                      {
+                        "name": ":P1",
+                        "type": "expression",
+                        "value": "{{query1.user_id}}",
+                        "test": ""
+                      }
+                    ]
+                  }
+                },
+                "meta": [
+                  {
+                    "name": "identity",
+                    "type": "text"
+                  },
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ],
+                "output": true
+              }
+            ]
+          },
+          "else": {
+            "steps": {
+              "name": "unauthorized",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 401,
+                "data": "Unauthorized"
+              }
+            }
+          }
+        },
+        "outputType": "boolean"
+      }
+    ]
+  }
+}

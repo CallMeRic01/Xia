@@ -1,0 +1,486 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/register.ejs",
+      "linkedForm": "register1"
+    },
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "product_id",
+        "name": "product_id"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_firstName",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_firstName"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_lastName",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_lastName"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_email",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:email": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_email"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_pw",
+        "multiple": true,
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:minlength": {
+              "param": "3",
+              "message": "Please enter at least {3} characters."
+            },
+            "core:alphanumeric": {
+              "param": ""
+            },
+            "core:nowhitespace": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_pw"
+      },
+      {
+        "type": "datetime",
+        "name": "user_dateSignup"
+      },
+      {
+        "type": "text",
+        "name": "user_authCode"
+      },
+      {
+        "type": "datetime",
+        "name": "user_validated"
+      }
+    ],
+    "$_SESSION": [
+      {
+        "type": "text",
+        "name": "regcode"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "validate",
+        "module": "validator",
+        "action": "validate",
+        "options": {
+          "data": [
+            {
+              "name": "validate_1",
+              "value": "{{$_POST.user_email}}",
+              "rules": {
+                "db:notexists": {
+                  "param": {
+                    "connection": "db",
+                    "table": "user",
+                    "column": "user_email"
+                  }
+                }
+              },
+              "fieldName": "user_email"
+            }
+          ]
+        }
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{$_POST.product_id>0}}",
+          "then": {
+            "steps": {
+              "name": "authorised",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 401,
+                "data": "Unauthorized"
+              }
+            }
+          }
+        },
+        "outputType": "boolean",
+        "disabled": true
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{$_POST.product_name!=$_SESSION.regcode}}",
+          "then": {
+            "steps": {
+              "name": "authorised_copy",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 401,
+                "data": "Unauthorized"
+              }
+            }
+          }
+        },
+        "outputType": "boolean",
+        "disabled": true
+      },
+      {
+        "name": "hash",
+        "module": "crypto",
+        "action": "passwordHash",
+        "options": {
+          "password": "{{$_POST.user_pw}}",
+          "algo": "argon2id"
+        },
+        "outputType": "text",
+        "output": true
+      },
+      {
+        "name": "insert",
+        "module": "dbupdater",
+        "action": "insert",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "insert",
+            "values": [
+              {
+                "table": "user",
+                "column": "user_firstName",
+                "type": "text",
+                "value": "{{$_POST.user_firstName}}",
+                "recid": 1
+              },
+              {
+                "table": "user",
+                "column": "user_lastName",
+                "type": "text",
+                "value": "{{$_POST.user_lastName}}",
+                "recid": 2
+              },
+              {
+                "table": "user",
+                "column": "user_email",
+                "type": "text",
+                "value": "{{$_POST.user_email}}",
+                "recid": 3
+              },
+              {
+                "table": "user",
+                "column": "user_pw",
+                "type": "text",
+                "value": "{{hash}}",
+                "recid": 4
+              }
+            ],
+            "table": "user",
+            "returning": "user_id",
+            "query": "insert into `user` (`user_email`, `user_firstName`, `user_lastName`, `user_pw`) values (?, ?, ?, ?)",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.user_firstName}}",
+                "test": ""
+              },
+              {
+                "name": ":P2",
+                "type": "expression",
+                "value": "{{$_POST.user_lastName}}",
+                "test": ""
+              },
+              {
+                "name": ":P3",
+                "type": "expression",
+                "value": "{{$_POST.user_email}}",
+                "test": ""
+              },
+              {
+                "name": ":P4",
+                "type": "expression",
+                "value": "{{hash}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          },
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true
+      },
+      {
+        "name": "identity",
+        "module": "auth",
+        "action": "login",
+        "options": {
+          "provider": "xiaD",
+          "username": "{{$_POST.user_email}}",
+          "password": "{{$_POST.user_pw}}"
+        },
+        "output": true,
+        "meta": []
+      },
+      {
+        "name": "saltcode",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "0,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9"
+        },
+        "meta": [],
+        "outputType": "text",
+        "output": false
+      },
+      {
+        "name": "codearray",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{saltcode.split(',')}}"
+        },
+        "meta": [],
+        "outputType": "text",
+        "output": false
+      },
+      {
+        "name": "randomarray",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_randomarray",
+          "value": "{{codearray.randomize()}}"
+        },
+        "meta": [],
+        "outputType": "text"
+      },
+      {
+        "name": "mycode",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_mycode",
+          "value": "\n"
+        },
+        "meta": [],
+        "outputType": "text",
+        "output": true
+      },
+      {
+        "name": "repeat",
+        "module": "core",
+        "action": "repeat",
+        "options": {
+          "repeat": 6,
+          "outputFields": [],
+          "exec": {
+            "steps": {
+              "name": "mycode",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "value": "{{g_mycode+randomarray[$index]}}",
+                "key": "g_mycode"
+              },
+              "meta": [],
+              "outputType": "text",
+              "output": true
+            }
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "$index",
+            "type": "number"
+          },
+          {
+            "name": "$number",
+            "type": "number"
+          },
+          {
+            "name": "$name",
+            "type": "text"
+          },
+          {
+            "name": "$value",
+            "type": "object"
+          },
+          {
+            "name": "mycode",
+            "type": "text",
+            "sub": []
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "insert1",
+        "module": "dbupdater",
+        "action": "insert",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "insert",
+            "values": [
+              {
+                "table": "user",
+                "column": "user_authCode",
+                "type": "text",
+                "value": "{{g_mycode + randomarray[$index]}}",
+                "condition": "{{$_POST.user_email == insert.identity}}",
+                "recid": 1
+              }
+            ],
+            "table": "user",
+            "returning": "user_id",
+            "query": "insert into `user` (`user_authCode`) values (?)",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{g_mycode + randomarray[$index]}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          },
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true,
+        "disabled": true
+      },
+      {
+        "name": "update",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "user",
+                "column": "user_authCode",
+                "type": "text",
+                "value": "{{g_mycode}}",
+                "recid": 1
+              }
+            ],
+            "table": "user",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user_id",
+                  "field": "user_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{insert.identity}}",
+                  "data": {
+                    "column": "user_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "user_id",
+            "query": "update `user` set `user_authCode` = ? where `user_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{g_mycode}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{insert.identity}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true
+      },
+      {
+        "name": "",
+        "module": "mail",
+        "action": "send",
+        "options": {
+          "instance": "mail",
+          "subject": "Your code",
+          "fromName": "noreply@XiaDessert",
+          "fromEmail": "eric.lim@triwind.net",
+          "toEmail": "{{$_POST.user_email}}",
+          "body": "{{g_mycode}}, {{$_POST.user_firstName}}",
+          "toName": "{{$_POST.user_firstName+$_POST.user_lastName}}"
+        },
+        "output": false
+      }
+    ]
+  },
+  "usedModules": {
+    "argon2": "^0.30.2"
+  }
+}

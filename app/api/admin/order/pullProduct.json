@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [
+            {
+              "table": "product",
+              "column": "pro_id",
+              "recid": 1
+            },
+            {
+              "table": "product",
+              "column": "pro_name",
+              "recid": 2
+            },
+            {
+              "table": "product",
+              "column": "pro_price",
+              "recid": 3
+            },
+            {
+              "table": "product",
+              "column": "pro_image",
+              "recid": 4
+            },
+            {
+              "table": "product",
+              "column": "pro_desc",
+              "recid": 5
+            },
+            {
+              "table": "product",
+              "column": "pro_stat",
+              "recid": 6
+            },
+            {
+              "table": "product",
+              "column": "pro_stock",
+              "recid": 7
+            }
+          ],
+          "params": [],
+          "table": {
+            "name": "product"
+          },
+          "primary": "pro_id",
+          "joins": [],
+          "query": "select `pro_id`, `pro_name`, `pro_price`, `pro_image`, `pro_desc`, `pro_stat`, `pro_stock` from `product`"
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "pro_id"
+        },
+        {
+          "type": "text",
+          "name": "pro_name"
+        },
+        {
+          "type": "number",
+          "name": "pro_price"
+        },
+        {
+          "type": "text",
+          "name": "pro_image"
+        },
+        {
+          "type": "text",
+          "name": "pro_desc"
+        },
+        {
+          "type": "boolean",
+          "name": "pro_stat"
+        },
+        {
+          "type": "number",
+          "name": "pro_stock"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

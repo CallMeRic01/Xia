@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_order.ejs",
+      "linkedForm": "closingForm"
+    },
+    "$_POST": [
+      {
+        "type": "number",
+        "fieldName": "rep_opening",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:number": {}
+          }
+        },
+        "name": "rep_opening"
+      },
+      {
+        "type": "number",
+        "fieldName": "rep_expenses",
+        "options": {
+          "rules": {
+            "core:number": {}
+          }
+        },
+        "name": "rep_expenses"
+      },
+      {
+        "type": "text",
+        "fieldName": "rep_date",
+        "name": "rep_date"
+      },
+      {
+        "type": "text",
+        "fieldName": "totalSales",
+        "name": "totalSales"
+      },
+      {
+        "type": "text",
+        "fieldName": "rep_remarks",
+        "name": "rep_remarks"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "totalSales",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "SELECT SUM(ord_totalAmount) AS total_sales\nFROM `order`\nWHERE DATE(ord_date) = CURDATE();",
+            "params": []
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "total_sales",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "profit",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_profit",
+          "value": "{{$_POST.totalSales-$_POST.rep_expenses}}"
+        },
+        "meta": [],
+        "outputType": "text"
+      },
+      {
+        "name": "closing",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "key": "g_closing",
+          "value": "{{($_POST.totalSales+$_POST.rep_opening-$_POST.rep_expenses)}}"
+        },
+        "meta": [],
+        "outputType": "text"
+      },
+      {
+        "name": "insert",
+        "module": "dbupdater",
+        "action": "insert",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "insert",
+            "values": [
+              {
+                "table": "salesReport",
+                "column": "rep_date",
+                "type": "datetime",
+                "value": "{{$_POST.rep_date}}"
+              },
+              {
+                "table": "salesReport",
+                "column": "rep_opening",
+                "type": "number",
+                "value": "{{$_POST.rep_opening}}"
+              },
+              {
+                "table": "salesReport",
+                "column": "rep_closing",
+                "type": "number",
+                "value": "{{g_closing}}"
+              },
+              {
+                "table": "salesReport",
+                "column": "rep_expenses",
+                "type": "number",
+                "value": "{{$_POST.rep_expenses}}"
+              },
+              {
+                "table": "salesReport",
+                "column": "rep_remarks",
+                "type": "text",
+                "value": "{{$_POST.rep_remarks}}"
+              },
+              {
+                "table": "salesReport",
+                "column": "rep_proLoss",
+                "type": "number",
+                "value": "{{g_profit}}"
+              }
+            ],
+            "table": "salesReport",
+            "returning": "rep_id",
+            "query": "insert into `salesReport` (`rep_closing`, `rep_date`, `rep_expenses`, `rep_opening`, `rep_proLoss`, `rep_remarks`) values (?, ?, ?, ?, ?, ?)",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.rep_date}}",
+                "test": ""
+              },
+              {
+                "name": ":P2",
+                "type": "expression",
+                "value": "{{$_POST.rep_opening}}",
+                "test": ""
+              },
+              {
+                "name": ":P3",
+                "type": "expression",
+                "value": "{{g_closing}}",
+                "test": ""
+              },
+              {
+                "name": ":P4",
+                "type": "expression",
+                "value": "{{$_POST.rep_expenses}}",
+                "test": ""
+              },
+              {
+                "name": ":P5",
+                "type": "expression",
+                "value": "{{$_POST.rep_remarks}}",
+                "test": ""
+              },
+              {
+                "name": ":P6",
+                "type": "expression",
+                "value": "{{g_profit}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "identity",
+            "type": "text"
+          },
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  }
+}

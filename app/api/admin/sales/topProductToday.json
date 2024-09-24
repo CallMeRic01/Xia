@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "year"
+      },
+      {
+        "type": "text",
+        "name": "month"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "custom",
+      "module": "dbupdater",
+      "action": "custom",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "query": "SELECT \n    product.pro_name, \n    SUM(detailsOrder.detOrd_quantity) AS total_sold, \n    SUM(detailsOrder.detOrd_quantity * product.pro_price) AS total_amount\nFROM \n    detailsOrder\nJOIN \n    product ON detailsOrder.pro_id = product.pro_id\nJOIN \n    `order` ON detailsOrder.ord_id = order.ord_id\nWHERE \n    DATE(order.ord_date) = CURDATE()\nGROUP BY \n    product.pro_name\nORDER BY \n    total_sold DESC\nLIMIT 3;\n",
+          "params": []
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "name": "pro_name",
+          "type": "text"
+        },
+        {
+          "name": "total_sold",
+          "type": "text"
+        },
+        {
+          "name": "total_amount",
+          "type": "text"
+        }
+      ]
+    }
+  }
+}

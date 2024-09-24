@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "ord_id"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "custom",
+      "module": "dbupdater",
+      "action": "custom",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "query": "select `detailsOrder`.`ord_id`,\n\t   `detailsOrder`.`pro_id`, \n       `product`.`pro_name`, \n       `product`.`pro_price`, \n       `detailsOrder`.`detOrd_quantity`, \n       (`product`.`pro_price` * `detailsOrder`.`detOrd_quantity`) as `total_amount`\nfrom `detailsOrder` \ninner join `product` \non `product`.`pro_id` = `detailsOrder`.`pro_id` \nwhere `detailsOrder`.`ord_id` = :P1\n",
+          "params": [
+            {
+              "name": ":P1",
+              "value": "{{$_GET.ord_id}}",
+              "test": "2735"
+            }
+          ]
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "ord_id"
+        },
+        {
+          "type": "number",
+          "name": "pro_id"
+        },
+        {
+          "type": "text",
+          "name": "pro_name"
+        },
+        {
+          "type": "number",
+          "name": "pro_price"
+        },
+        {
+          "type": "number",
+          "name": "detOrd_quantity"
+        }
+      ],
+      "outputType": "array",
+      "type": "dbcustom_query"
+    }
+  }
+}

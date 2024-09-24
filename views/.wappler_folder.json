@@ -1,0 +1,50 @@
+{
+  "admin_dashboard.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "admin_addProduct.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "admin_product.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "admin_order.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "login.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "admin_staffManagement.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "reset_password.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "test.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "test_admin_product.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "test_admin_order.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "Home.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "index.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "cust_num"
+      },
+      {
+        "type": "text",
+        "name": "cust_name"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [],
+          "params": [
+            {
+              "operator": "contains",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.cust_name}}",
+              "test": ""
+            },
+            {
+              "operator": "contains",
+              "type": "expression",
+              "name": ":P2",
+              "value": "{{$_GET.cust_num}}",
+              "test": ""
+            }
+          ],
+          "table": {
+            "name": "customer"
+          },
+          "primary": "cust_id",
+          "joins": [],
+          "query": "select * from `customer` where `customer`.`cust_name` like ? or `customer`.`cust_num` like ?",
+          "wheres": {
+            "condition": "OR",
+            "rules": [
+              {
+                "id": "customer.cust_name",
+                "field": "customer.cust_name",
+                "type": "string",
+                "operator": "contains",
+                "value": "{{$_GET.cust_name}}",
+                "data": {
+                  "table": "customer",
+                  "column": "cust_name",
+                  "type": "text",
+                  "columnObj": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "primary": false,
+                    "nullable": true,
+                    "name": "cust_name"
+                  }
+                },
+                "operation": "LIKE"
+              },
+              {
+                "id": "customer.cust_num",
+                "field": "customer.cust_num",
+                "type": "string",
+                "operator": "contains",
+                "value": "{{$_GET.cust_num}}",
+                "data": {
+                  "table": "customer",
+                  "column": "cust_num",
+                  "type": "text",
+                  "columnObj": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "primary": false,
+                    "nullable": true,
+                    "name": "cust_num"
+                  }
+                },
+                "operation": "LIKE"
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          }
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "cust_id"
+        },
+        {
+          "type": "text",
+          "name": "cust_name"
+        },
+        {
+          "type": "text",
+          "name": "cust_num"
+        },
+        {
+          "type": "text",
+          "name": "cust_email"
+        },
+        {
+          "type": "date",
+          "name": "cust_dob"
+        },
+        {
+          "type": "number",
+          "name": "cust_loyalP"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

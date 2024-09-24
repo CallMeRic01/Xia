@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "selected_date"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "query",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "SELECT SUM(ord_totalAmount) AS total_sales\nFROM `order`\nWHERE DATE(ord_date) = CURDATE();\n",
+            "params": []
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "total_sales",
+            "type": "text"
+          }
+        ],
+        "type": "dbcustom_query"
+      },
+      {
+        "name": "openCloseToday",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "select `rep_date`, `rep_opening`, `rep_closing`, `rep_expenses`, `rep_remarks`, `rep_proLoss` \nfrom `salesReport` \nwhere `salesReport`.`rep_date` = CURDATE();",
+            "params": []
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "rep_date",
+            "type": "datetime"
+          },
+          {
+            "name": "rep_opening",
+            "type": "text"
+          },
+          {
+            "name": "rep_closing",
+            "type": "text"
+          },
+          {
+            "name": "rep_expenses",
+            "type": "text"
+          },
+          {
+            "name": "rep_remarks",
+            "type": "text"
+          },
+          {
+            "name": "rep_proLoss",
+            "type": "text"
+          }
+        ],
+        "type": "dbcustom_query"
+      }
+    ]
+  }
+}

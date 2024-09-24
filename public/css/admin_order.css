@@ -1,0 +1,443 @@
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    -webkit-transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Card Styles */
+.small-card {
+    width: 100%;
+    max-width: 200px;
+    margin: 15px;
+    border-radius: 15px;
+    overflow: hidden;
+    background-color: #ffffff;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    -webkit-transition: -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+}
+
+.small-card:hover {
+    -webkit-transform: translateY(-10px) scale(1.02);
+            transform: translateY(-10px) scale(1.02);
+    -webkit-box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.small-card img {
+    height: 150px;
+    width: 100%;
+    -o-object-fit: cover;
+       object-fit: cover;
+    -webkit-transition: -webkit-transform 0.3s ease;
+    transition: -webkit-transform 0.3s ease;
+    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+}
+
+.small-card:hover img {
+    -webkit-transform: scale(1.1);
+            transform: scale(1.1);
+}
+
+.small-card .card-body {
+    padding: 15px;
+    text-align: center;
+}
+
+.small-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.small-card .card-text {
+    color: #28a745;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.small-card .btn {
+    font-size: 0.9rem;
+    font-weight: bold;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+    -webkit-transition: background-color 0.3s ease, -webkit-transform 0.2s ease;
+    transition: background-color 0.3s ease, -webkit-transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease, -webkit-transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    -webkit-transform: translateY(-2px);
+            transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.btn-outline-danger.btn-sm,
+.btn-outline-success.btn-sm,
+.btn-outline-warning.btn-sm {
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+.btn-outline-danger.btn-sm:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.btn-outline-success.btn-sm:hover {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.btn-outline-warning.btn-sm:hover {
+    background-color: #ffc107;
+    color: #ffffff;
+}
+
+/* Table Styles */
+.table {
+    background-color: #ffffff;
+    border-radius: 15px;
+    overflow: hidden;
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.table thead th {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Form Styles */
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    -webkit-transition: border-color 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, -webkit-box-shadow 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.form-check-label {
+    margin-left: 5px;
+}
+
+.input-group .form-control {
+    border-radius: 10px;
+}
+
+.input-group-text {
+    border-radius: 10px;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: #ffffff;
+    border-bottom: none;
+}
+
+.modal-title {
+    font-weight: 500;
+}
+
+.modal-footer .btn {
+    min-width: 100px;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 10px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Notifications */
+.dmx-notification {
+    -webkit-animation: slideInUp 0.5s ease-in-out forwards;
+            animation: slideInUp 0.5s ease-in-out forwards;
+}
+
+@-webkit-keyframes slideInUp {
+    from {
+        -webkit-transform: translateY(20px);
+                transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        -webkit-transform: translateY(20px);
+                transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Divider Styles */
+.divider {
+    border-bottom: 1px solid #ddd;
+    margin: 20px 0;
+    width: 100%;
+}
+
+/* Scrollable Product List */
+.product-list-scroll {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.product-list-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.product-list-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.product-list-scroll::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.product-list-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive Grid */
+@media (min-width: 576px) {
+    .col-6 {
+        -webkit-box-flex: 0;
+            -ms-flex: 0 0 auto;
+                flex: 0 0 auto;
+        width: 50%;
+    }
+}
+
+@media (min-width: 768px) {
+    .col-md-4 {
+        -webkit-box-flex: 0;
+            -ms-flex: 0 0 auto;
+                flex: 0 0 auto;
+        width: 33.3333%;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-lg-3 {
+        -webkit-box-flex: 0;
+            -ms-flex: 0 0 auto;
+                flex: 0 0 auto;
+        width: 25%;
+    }
+}
+
+/* Button Group in Table */
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Quantity Controls */
+.quantity-controls {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+}
+
+.quantity-controls button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.quantity-controls span {
+    margin: 0 10px;
+    font-weight: 500;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #ffffff;
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Additional Styles for Admin Order Page */
+#admin_order h3 {
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+#admin_order .form-group {
+    margin-bottom: 15px;
+}
+
+#admin_order .btn {
+    margin-top: 15px;
+}
+
+#admin_order .alert-danger {
+    margin-top: 15px;
+}
+
+/* Customer Registration Modal */
+#CustomerReg .modal-header {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+#CustomerReg .modal-title {
+    font-weight: 500;
+}
+
+#CustomerReg .form-control {
+    margin-bottom: 15px;
+}
+
+/* Refund Modal */
+#RefundModal .modal-header {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+#RefundModal .modal-title {
+    font-weight: 500;
+}
+
+/* Points Redeem Modal */
+#MemberPointsRedeem .modal-header {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+#MemberPointsRedeem .modal-title {
+    font-weight: 500;
+}
+
+#MemberPointsRedeem .form-range {
+    width: 100%;
+}
+
+/* Animations */
+.fade-in {
+    opacity: 0;
+    -webkit-animation: fadeIn 0.5s ease-in forwards;
+            animation: fadeIn 0.5s ease-in forwards;
+}
+
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+        -webkit-transform: translateY(10px);
+                transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        -webkit-transform: translateY(10px);
+                transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+    }
+}

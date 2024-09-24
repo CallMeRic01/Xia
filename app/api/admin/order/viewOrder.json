@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "viewOrderDetails",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "SELECT \n    `product`.`pro_name`, \n    `product`.`pro_price`, \n    `detailsOrder`.`ord_id`, \n    `detailsOrder`.`pro_id`, \n    `detailsOrder`.`detOrd_quantity`, \n    `detailsOrder`.`detOrd_date`, \n    `detailsOrder`.`cust_id`\nFROM \n    `detailsOrder`\nINNER JOIN \n    `product` \nON \n    `product`.`pro_id` = `detailsOrder`.`pro_id`\nWHERE \n    DATE(`detailsOrder`.`detOrd_date`) = CURDATE();\n",
+            "params": [
+              {
+                "name": ":P1",
+                "value": "{{NOW.CURDATE()}}",
+                "test": "2024-9-3",
+                "recid": 1
+              }
+            ]
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "pro_name",
+            "type": "text"
+          },
+          {
+            "name": "pro_price",
+            "type": "text"
+          },
+          {
+            "name": "ord_id",
+            "type": "number"
+          },
+          {
+            "name": "pro_id",
+            "type": "number"
+          },
+          {
+            "name": "detOrd_quantity",
+            "type": "number"
+          },
+          {
+            "name": "detOrd_date",
+            "type": "datetime"
+          },
+          {
+            "name": "cust_id",
+            "type": "number"
+          }
+        ],
+        "type": "dbcustom_query",
+        "disabled": true
+      },
+      {
+        "name": "query",
+        "module": "dbupdater",
+        "action": "custom",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "query": "SELECT \n    `detailsOrder`.`ord_id`,\n    GROUP_CONCAT(`product`.`pro_name` SEPARATOR ', ') AS `product_names`,\n    SUM(`detailsOrder`.`detOrd_quantity`) AS `total_quantity`,\n    SUM(`product`.`pro_price` * `detailsOrder`.`detOrd_quantity`) AS `total_price`,\n    `detailsOrder`.`detOrd_date`,\n    `detailsOrder`.`cust_id`\nFROM \n    `detailsOrder`\nINNER JOIN \n    `product` \nON \n    `product`.`pro_id` = `detailsOrder`.`pro_id`\nWHERE \n    DATE(`detailsOrder`.`detOrd_date`) = CURDATE()\nGROUP BY \n    `detailsOrder`.`ord_id`, \n    `detailsOrder`.`detOrd_date`, \n    `detailsOrder`.`cust_id`;\n",
+            "params": []
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "ord_id",
+            "type": "number"
+          },
+          {
+            "name": "product_names",
+            "type": "text"
+          },
+          {
+            "name": "total_quantity",
+            "type": "text"
+          },
+          {
+            "name": "total_price",
+            "type": "text"
+          },
+          {
+            "name": "detOrd_date",
+            "type": "datetime"
+          },
+          {
+            "name": "cust_id",
+            "type": "number"
+          }
+        ],
+        "type": "dbcustom_query"
+      }
+    ]
+  }
+}

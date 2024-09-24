@@ -1,0 +1,9 @@
+{
+  "name": "regcode",
+  "module": "core",
+  "action": "setsession",
+  "options": {
+    "value": "asz223"
+  },
+  "output": true
+}

@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "user_id"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "name": "user_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "update",
+      "module": "dbupdater",
+      "action": "update",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "update",
+          "values": [
+            {
+              "table": "user_clockInOut",
+              "column": "cIO_out",
+              "type": "datetime",
+              "value": "{{NOW}}"
+            },
+            {
+              "table": "user_clockInOut",
+              "column": "cIO_hrsWorked",
+              "type": "datetime",
+              "value": "{{TIMESTAMPDIFF(SECOND, clo_in, NOW()) / 3600 }}"
+            }
+          ],
+          "table": "user_clockInOut",
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "user_id",
+                "field": "user_id",
+                "type": "double",
+                "operator": "equal",
+                "value": "{{$_POST.user_id}}",
+                "data": {
+                  "column": "user_id"
+                },
+                "operation": "="
+              },
+              {
+                "id": "cIO_out",
+                "field": "cIO_out",
+                "type": "datetime",
+                "operator": "equal",
+                "value": "NULL",
+                "data": {
+                  "column": "cIO_out"
+                },
+                "operation": "="
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          },
+          "returning": "cIO_id",
+          "query": "update `user_clockInOut` set `cIO_out` = ?, `cIO_hrsWorked` = ? where `user_id` = ? and `cIO_out` = ?",
+          "params": [
+            {
+              "name": ":P1",
+              "type": "expression",
+              "value": "{{NOW}}",
+              "test": ""
+            },
+            {
+              "name": ":P2",
+              "type": "expression",
+              "value": "{{TIMESTAMPDIFF(SECOND, clo_in, NOW()) / 3600 }}",
+              "test": ""
+            },
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P3",
+              "value": "{{$_POST.user_id}}",
+              "test": ""
+            }
+          ]
+        }
+      },
+      "meta": [
+        {
+          "name": "affected",
+          "type": "number"
+        }
+      ]
+    }
+  }
+}

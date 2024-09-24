@@ -1,0 +1,654 @@
+/* ===========================================================
+   General Styles
+   =========================================================== */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    -webkit-transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.container-flex {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    gap: 20px;
+}
+
+@media (min-width: 992px) {
+    .container-flex {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+                flex-direction: row;
+    }
+
+    .product-list-scroll .col-6 {
+        width: 50%;
+    }
+
+    .product-list-scroll .col-md-4 {
+        width: 33.3333%;
+    }
+}
+
+@media (max-width: 768px) {
+    .small-card {
+        max-width: 100%;
+    }
+
+    .product-list-scroll .col-6,
+    .product-list-scroll .col-md-4 {
+        width: 100%;
+        -webkit-box-flex: 0;
+            -ms-flex: 0 0 100%;
+                flex: 0 0 100%;
+    }
+
+    .container-flex {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+}
+
+/* ===========================================================
+   Card Styles
+   =========================================================== */
+.small-card {
+    width: 100%;
+    max-width: 200px;
+    margin: 15px;
+    border-radius: 15px;
+    overflow: hidden;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    -webkit-transition: -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, -webkit-transform 0.3s ease, -webkit-box-shadow 0.3s ease;
+    background-color: #ffffff;
+}
+
+.small-card:hover {
+    -webkit-transform: translateY(-10px) scale(1.02);
+            transform: translateY(-10px) scale(1.02);
+    -webkit-box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.small-card img {
+    height: 120px;
+    -o-object-fit: cover;
+       object-fit: cover;
+    -webkit-transition: -webkit-transform 0.3s ease;
+    transition: -webkit-transform 0.3s ease;
+    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+}
+
+.small-card:hover img {
+    -webkit-transform: scale(1.1);
+            transform: scale(1.1);
+}
+
+.small-card .card-body {
+    padding: 15px;
+}
+
+.small-card .btn {
+    font-size: 0.9rem;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+/* ===========================================================
+   Button Styles
+   =========================================================== */
+/* Consolidated Button Styles */
+.btn-primary,
+.style3 {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #ffffff;
+    -webkit-transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary:hover,
+.style3:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+    -webkit-transform: translateY(-2px);
+            transform: translateY(-2px);
+}
+
+button:active {
+    -webkit-transform: scale(0.98);
+            transform: scale(0.98);
+}
+
+button:hover {
+    -webkit-animation: buttonHover 0.3s ease-in-out forwards;
+            animation: buttonHover 0.3s ease-in-out forwards;
+}
+
+/* Additional Button Styles */
+.style2 {
+    background-color: #000;
+}
+
+.style2:hover {
+    background-color: #575757;
+}
+
+.style4 {
+    background-color: #4d4d4d;
+}
+
+.style5 {
+    background-color: #4a4a4a;
+    border-radius: 10px;
+}
+
+.add {} /* Consider renaming to a more descriptive class */
+
+/* ===========================================================
+   Table Styles
+   =========================================================== */
+.table {
+    background-color: #ffffff;
+    border-radius: 15px;
+    overflow: hidden;
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+    padding: 12px;
+}
+
+.table thead th {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f2f2f2;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #ddd;
+}
+
+/* ===========================================================
+   Form Styles
+   =========================================================== */
+.form-control,
+.form-select {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    -webkit-transition: border-color 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, -webkit-box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, -webkit-box-shadow 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-check-input {
+    border-radius: 15px;
+}
+
+/* ===========================================================
+   Modal Styles
+   =========================================================== */
+.modal-content {
+    border-radius: 15px;
+    overflow: hidden;
+    -webkit-animation: slideUp 0.3s ease-out forwards;
+            animation: slideUp 0.3s ease-out forwards;
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: #ffffff;
+    border-bottom: none;
+}
+
+.modal-header.bg-primary,
+.modal-header.bg-success {
+    color: #ffffff;
+}
+
+.modal-dialog {
+    /* Added modal-dialog-centered for vertical centering */
+}
+
+.modal-dialog-centered {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* ===========================================================
+   Animation Keyframes
+   =========================================================== */
+/* Button Hover Animation */
+@-webkit-keyframes buttonHover {
+    from {
+        -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    to {
+        -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+}
+@keyframes buttonHover {
+    from {
+        -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+    to {
+        -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Spinner Animation */
+@-webkit-keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+    }
+}
+@keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+    }
+}
+
+/* FadeIn Animation */
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+        -webkit-transform: translateY(10px);
+                transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+    }
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        -webkit-transform: translateY(10px);
+                transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+    }
+}
+
+/* SlideUp Animation */
+@-webkit-keyframes slideUp {
+    from {
+        -webkit-transform: translateY(50px);
+                transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        opacity: 1;
+    }
+}
+@keyframes slideUp {
+    from {
+        -webkit-transform: translateY(50px);
+                transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Fade-In Effect */
+.fade-in {
+    opacity: 0;
+    -webkit-animation: fadeIn 0.5s ease-in-out forwards;
+            animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Slide-In Effect */
+.slide-in {
+    opacity: 0;
+    -webkit-transform: translateX(50px);
+            transform: translateX(50px);
+    -webkit-animation: slideIn 0.5s ease-out forwards;
+            animation: slideIn 0.5s ease-out forwards;
+}
+
+@-webkit-keyframes slideIn {
+    from {
+        opacity: 0;
+        -webkit-transform: translateX(50px);
+                transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translateX(0);
+                transform: translateX(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        -webkit-transform: translateX(50px);
+                transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        -webkit-transform: translateX(0);
+                transform: translateX(0);
+    }
+}
+
+/* Notification Animation */
+.dmx-notification {
+    -webkit-animation: slideInUp 0.5s ease-in-out forwards;
+            animation: slideInUp 0.5s ease-in-out forwards;
+}
+
+@-webkit-keyframes slideInUp {
+    from {
+        -webkit-transform: translateY(20px);
+                transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        -webkit-transform: translateY(20px);
+                transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ===========================================================
+   Spinner Styles
+   =========================================================== */
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #09f;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+}
+
+/* ===========================================================
+   Divider Styles
+   =========================================================== */
+.divider {
+    width: 50%;
+    height: 2px;
+    background-color: #ccc;
+    margin: 10px auto;
+    border-bottom: 1px solid #ddd; /* Consolidated with existing styles */
+}
+
+/* ===========================================================
+   Scrollable Sections and Custom Scrollbars
+   =========================================================== */
+.product-list-scroll {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.product-list-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.product-list-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.product-list-scroll::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.product-list-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.scrollable-section {
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-box-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
+}
+
+.fixed-section {
+    -webkit-box-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
+    padding-left: 20px;
+}
+
+/* ===========================================================
+   Navbar Styles
+   =========================================================== */
+.navbar {
+    background-color: #fff;
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* ===========================================================
+   Admin Product Specific Styles
+   =========================================================== */
+#admin_product {
+    font-family: 'Roboto', sans-serif;
+}
+
+#admin_product .modal-header {
+    background-color: #007bff;
+    color: white;
+}
+
+#admin_product .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    -webkit-transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#admin_product .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+#admin_product .table thead th {
+    background-color: #007bff;
+    color: white;
+}
+
+#admin_product .form-control:focus {
+    border-color: #007bff;
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+#admin_product .img-thumbnail {
+    border-radius: 10px;
+}
+
+/* ===========================================================
+   Admin Add Product Specific Styles
+   =========================================================== */
+#admin_addProduct {
+    font-family: 'Roboto', sans-serif;
+}
+
+#admin_addProduct h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+}
+
+#admin_addProduct .text-h3 {
+    font-size: 1.2em;
+    margin-bottom: 2em;
+}
+
+#admin_addProduct .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    -webkit-transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border-radius: 15px;
+}
+
+#admin_addProduct .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+#admin_addProduct .form-control {
+    border-radius: 15px;
+}
+
+#admin_addProduct .form-control:focus {
+    border-color: #007bff;
+    -webkit-box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-radius: 15px;
+}
+
+#admin_addProduct .form-check-input {
+    border-radius: 15px;
+}
+
+#admin_addProduct .img-thumbnail {
+    border-radius: 15px;
+}
+
+#admin_addProduct .card {
+    border-radius: 15px;
+    -webkit-box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#admin_addProduct .card-body {
+    border-radius: 15px;
+}
+
+#admin_addProduct .modal-content {
+    border-radius: 15px;
+}
+
+#admin_addProduct .table {
+    border-radius: 15px;
+}
+
+#admin_addProduct .table thead th {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+#admin_addProduct .table tbody tr {
+    border-radius: 15px;
+}
+
+#admin_addProduct .fade-in {
+    -webkit-animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
+}
+
+#admin_addProduct .shadow-lg {
+    -webkit-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+#admin_addProduct .style1 {
+    padding: 2em;
+    margin-top: 2em;
+}
+
+/* ===========================================================
+   Utility Classes
+   =========================================================== */
+.wappler-temp {} /* Consider removing if unused */
+
+.add {} /* Consider renaming to a more descriptive class */
+
+.style1 {
+    border-radius: 15px;
+}
+
+.style3.hovered {} /* If not used, consider removing */
+
+/* ===========================================================
+   Miscellaneous Styles
+   =========================================================== */
+.:hover {
+    background-color: #5c5c5c;
+}

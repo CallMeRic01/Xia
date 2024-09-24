@@ -1,0 +1,71 @@
+{
+  "projectName": "XiaDessert",
+  "styleFile": "/css/style.css",
+  "assetsFolder": "/assets",
+  "designFramework": "bootstrap5",
+  "frameworks": [
+    {
+      "name": "fontawesome_5",
+      "type": "cdn"
+    },
+    {
+      "name": "bootstrap5",
+      "type": "local"
+    },
+    {
+      "name": "appConnect",
+      "type": "local"
+    }
+  ],
+  "projectServerModel": "node",
+  "runtime": "capacitor",
+  "webRootFolder": "/public",
+  "useRouting": true,
+  "addBase": true,
+  "routingHandler": "node",
+  "projectLinksType": "site",
+  "targets": [
+    {
+      "name": "Development",
+      "remoteURL": "https://xiad.com.fundingproexpert.com",
+      "access": "ftpes",
+      "usage": "production",
+      "databaseConnectionType": "custom",
+      "databaseType": "mysql",
+      "db_host": "127.0.0.1",
+      "db_port": "3306",
+      "db_user": "fundingp_xiad1",
+      "db_password": "Xiad123!@#Xiad",
+      "db_database": "fundingp_xiad",
+      "ftpUser": "xiad1@xiad.com.fundingproexpert.com",
+      "ftpServer": "ftp.fundingproexpert.com",
+      "ftpPort": 21,
+      "ftpPassword": "3ac4bde3a1cd8ab3039d4d7b3de8"
+    },
+    {
+      "name": "docker_local",
+      "remoteURL": "http://localhost:8100",
+      "databaseConnectionType": "custom",
+      "databaseType": "mysql",
+      "db_host": "localhost",
+      "db_port": "3306",
+      "db_user": "root",
+      "db_password": "xiad2",
+      "db_database": "xiad2",
+      "webLoggingMaxFiles": "5",
+      "webLoggingMaxFileSize": "10m",
+      "targetType": "docker",
+      "dockerTimezone": "Asia/Kuala_Lumpur",
+      "webServer": "node",
+      "webServerLang": "node",
+      "NodeVersion": "latest",
+      "NodeOS": "debian",
+      "NodeImageType": "slim",
+      "webServerPort": 8100
+    }
+  ],
+  "activeTarget": "Development",
+  "projectType": "web",
+  "userUploadsFolder": "/public/upload",
+  "extensions": []
+}

@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "number",
+        "name": "user_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [
+            {
+              "table": "user",
+              "column": "user_id"
+            },
+            {
+              "table": "user",
+              "column": "user_firstName"
+            },
+            {
+              "table": "user",
+              "column": "user_lastName"
+            }
+          ],
+          "params": [],
+          "table": {
+            "name": "user"
+          },
+          "primary": "user_id",
+          "joins": [],
+          "query": "select `user_id`, `user_firstName`, `user_lastName` from `user`"
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "user_id"
+        },
+        {
+          "type": "text",
+          "name": "user_firstName"
+        },
+        {
+          "type": "text",
+          "name": "user_lastName"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

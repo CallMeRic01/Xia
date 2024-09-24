@@ -1,0 +1,524 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/reset_password.ejs",
+      "linkedForm": "login1"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "g_hashh",
+        "name": "g_hashh"
+      },
+      {
+        "type": "text",
+        "fieldName": "g_emaill",
+        "name": "g_emaill"
+      },
+      {
+        "type": "text",
+        "fieldName": "text1",
+        "name": "text1"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_pw",
+        "options": {
+          "rules": {
+            "core:required": {
+              "param": ""
+            },
+            "core:minlength": {
+              "param": "3",
+              "message": "Please enter at least {3} characters."
+            },
+            "core:alphanumeric": {
+              "param": ""
+            },
+            "core:nowhitespace": {
+              "param": ""
+            }
+          }
+        },
+        "name": "user_pw"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_pw1",
+        "options": {
+          "rules": {
+            "core:equalTo": {
+              "param": "user_pw",
+              "message": "Password must be same "
+            }
+          }
+        },
+        "name": "user_pw1"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.email}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "user"
+            },
+            "primary": "user_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user.user_email",
+                  "field": "user.user_email",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.email}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_email",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "nullable": true,
+                      "name": "user_email"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "user"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select * from `user` where `user`.`user_email` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "number",
+            "name": "user_id"
+          },
+          {
+            "type": "text",
+            "name": "user_firstName"
+          },
+          {
+            "type": "text",
+            "name": "user_lastName"
+          },
+          {
+            "type": "text",
+            "name": "user_email"
+          },
+          {
+            "type": "text",
+            "name": "user_pw"
+          },
+          {
+            "type": "datetime",
+            "name": "user_dateSignup"
+          },
+          {
+            "type": "text",
+            "name": "user_authCode"
+          },
+          {
+            "type": "datetime",
+            "name": "user_validated"
+          }
+        ],
+        "outputType": "array",
+        "disabled": true
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{query}}",
+          "then": {
+            "steps": {
+              "name": "repeat",
+              "module": "core",
+              "action": "repeat",
+              "options": {
+                "repeat": "{{query}}",
+                "outputFields": [],
+                "exec": {
+                  "steps": {
+                    "name": "",
+                    "module": "core",
+                    "action": "condition",
+                    "options": {
+                      "if": "{{user_email.sha1(user_pw)==$_POST.hash}}",
+                      "then": {
+                        "steps": {
+                          "name": "update",
+                          "module": "dbupdater",
+                          "action": "update",
+                          "options": {
+                            "connection": "db",
+                            "sql": {
+                              "type": "update",
+                              "values": [
+                                {
+                                  "table": "user",
+                                  "column": "user_pw",
+                                  "type": "text",
+                                  "value": "{{$_POST.user_pw.sha1('salt123')}}"
+                                }
+                              ],
+                              "table": "user",
+                              "wheres": {
+                                "condition": "AND",
+                                "rules": [
+                                  {
+                                    "id": "user_email",
+                                    "field": "user_email",
+                                    "type": "string",
+                                    "operator": "equal",
+                                    "value": "{{user_email}}",
+                                    "data": {
+                                      "column": "user_email"
+                                    },
+                                    "operation": "="
+                                  }
+                                ],
+                                "conditional": null,
+                                "valid": true
+                              },
+                              "returning": "user_id",
+                              "query": "update `user` set `user_pw` = ? where `user_email` = ?",
+                              "params": [
+                                {
+                                  "name": ":P1",
+                                  "type": "expression",
+                                  "value": "{{$_POST.user_pw.sha1('salt123')}}",
+                                  "test": ""
+                                },
+                                {
+                                  "operator": "equal",
+                                  "type": "expression",
+                                  "name": ":P2",
+                                  "value": "{{user_email}}",
+                                  "test": ""
+                                }
+                              ]
+                            }
+                          },
+                          "meta": [
+                            {
+                              "name": "affected",
+                              "type": "number"
+                            }
+                          ]
+                        }
+                      },
+                      "else": {
+                        "steps": {
+                          "name": "Error",
+                          "module": "core",
+                          "action": "response",
+                          "options": {
+                            "status": 400,
+                            "data": "Hash Doesn't Match"
+                          }
+                        }
+                      }
+                    },
+                    "outputType": "boolean"
+                  }
+                }
+              },
+              "output": true,
+              "meta": [
+                {
+                  "name": "$index",
+                  "type": "number"
+                },
+                {
+                  "name": "$number",
+                  "type": "number"
+                },
+                {
+                  "name": "$name",
+                  "type": "text"
+                },
+                {
+                  "name": "$value",
+                  "type": "object"
+                },
+                {
+                  "name": "user_id",
+                  "type": "number"
+                },
+                {
+                  "name": "user_firstName",
+                  "type": "text"
+                },
+                {
+                  "name": "user_lastName",
+                  "type": "text"
+                },
+                {
+                  "name": "user_email",
+                  "type": "text"
+                },
+                {
+                  "name": "user_pw",
+                  "type": "text"
+                },
+                {
+                  "name": "user_dateSignup",
+                  "type": "datetime"
+                },
+                {
+                  "name": "user_authCode",
+                  "type": "text"
+                },
+                {
+                  "name": "user_validated",
+                  "type": "datetime"
+                }
+              ],
+              "outputType": "array"
+            }
+          },
+          "else": {
+            "steps": {
+              "name": "Error",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 400,
+                "data": "User not Found"
+              }
+            }
+          }
+        },
+        "outputType": "boolean",
+        "disabled": true
+      },
+      {
+        "name": "query1",
+        "module": "dbconnector",
+        "action": "single",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.g_emaill}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "user"
+            },
+            "primary": "user_id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user.user_email",
+                  "field": "user.user_email",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.g_emaill}}",
+                  "data": {
+                    "table": "user",
+                    "column": "user_email",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "primary": false,
+                      "nullable": true,
+                      "name": "user_email"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "user"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select * from `user` where `user`.`user_email` = ?"
+          }
+        },
+        "meta": [
+          {
+            "type": "number",
+            "name": "user_id"
+          },
+          {
+            "type": "text",
+            "name": "user_firstName"
+          },
+          {
+            "type": "text",
+            "name": "user_lastName"
+          },
+          {
+            "type": "text",
+            "name": "user_email"
+          },
+          {
+            "type": "text",
+            "name": "user_pw"
+          },
+          {
+            "type": "datetime",
+            "name": "user_dateSignup"
+          },
+          {
+            "type": "text",
+            "name": "user_authCode"
+          },
+          {
+            "type": "datetime",
+            "name": "user_validated"
+          }
+        ],
+        "outputType": "object"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{query1.user_email.sha1(query1.user_pw)==$_POST.g_hashh}}",
+          "then": {
+            "steps": [
+              {
+                "name": "hash",
+                "module": "crypto",
+                "action": "passwordHash",
+                "options": {
+                  "algo": "argon2id",
+                  "password": "{{$_POST.user_pw}}"
+                },
+                "outputType": "text"
+              },
+              {
+                "name": "update1",
+                "module": "dbupdater",
+                "action": "update",
+                "options": {
+                  "connection": "db",
+                  "sql": {
+                    "type": "update",
+                    "values": [
+                      {
+                        "table": "user",
+                        "column": "user_pw",
+                        "type": "text",
+                        "value": "{{hash}}"
+                      }
+                    ],
+                    "table": "user",
+                    "wheres": {
+                      "condition": "AND",
+                      "rules": [
+                        {
+                          "id": "user_email",
+                          "field": "user_email",
+                          "type": "string",
+                          "operator": "equal",
+                          "value": "{{$_POST.g_emaill}}",
+                          "data": {
+                            "column": "user_email"
+                          },
+                          "operation": "="
+                        }
+                      ],
+                      "conditional": null,
+                      "valid": true
+                    },
+                    "returning": "user_id",
+                    "query": "update `user` set `user_pw` = ? where `user_email` = ?",
+                    "params": [
+                      {
+                        "name": ":P1",
+                        "type": "expression",
+                        "value": "{{hash}}",
+                        "test": ""
+                      },
+                      {
+                        "operator": "equal",
+                        "type": "expression",
+                        "name": ":P2",
+                        "value": "{{$_POST.g_emaill}}",
+                        "test": ""
+                      }
+                    ]
+                  }
+                },
+                "meta": [
+                  {
+                    "name": "affected",
+                    "type": "number"
+                  }
+                ]
+              }
+            ]
+          },
+          "else": {
+            "steps": {
+              "name": "Error",
+              "module": "core",
+              "action": "response",
+              "options": {
+                "status": 400,
+                "data": "Hash doesn't match"
+              }
+            }
+          }
+        },
+        "outputType": "boolean",
+        "output": true
+      }
+    ]
+  },
+  "usedModules": {
+    "argon2": "^0.30.2"
+  }
+}

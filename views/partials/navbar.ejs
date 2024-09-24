@@ -1,0 +1,107 @@
+<!-- Include Wappler dependencies and components -->
+<!-- Wappler include head-page="layouts/main" appconnect="local" is="dmx-app" bootstrap5="local" fontawesome_5="cdn" components="{dmxBootstrap5Navigation:{},dmxValidator:{},dmxBootbox5:{},dmxBrowser:{},dmxBootstrap5Alert:{},dmxDataTraversal:{},dmxNotifications:{},dmxBootstrap5Modal:{},dmxDatastore:{},dmxFormatter:{},dmxBootstrap5TableGenerator:{}}" id="navbar" -->
+<meta name="ac:route" content="/partials/navbar">
+<dmx-datastore id="clockInStore"></dmx-datastore>
+<dmx-serverconnect id="conn_oneStaff" url="/api/security/users/viewStaff" noload="true"></dmx-serverconnect>
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+<header class="mb-4">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3 mb-5 bg-body rounded">
+        <div class="container">
+            <div is="dmx-browser" id="browser1"></div>
+            <dmx-serverconnect id="conn_account" url="/api/registration/whoami"></dmx-serverconnect>
+            <a class="navbar-brand" href="#">XiaDessert [{{conn_account.data.query.user_firstName}}]</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar1_collapse" aria-controls="navbar1_collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar1_collapse">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-item nav-link active" href="/Home" id="HomePage">Home</a>
+                    <a class="nav-item nav-link" href="/admin_order" id="POS_page">POS</a><a class="nav-item nav-link" href="/admin_dashboard" id="Dashboard_page">Dashboard</a>
+                    <a class="nav-item nav-link" href="/admin_product" id="Product_list">Products</a>
+
+                    <a class="nav-item nav-link" href="/admin_staffManagement" id="StaffManagement">Staff Management</a>
+                    <a class="nav-item nav-link" dmx-on:click="clockInOutModal.show()">Clock In/Out</a>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbar1_dropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Account
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbar1_dropdown">
+                            <a class="dropdown-item" href="/login" dmx-show="conn_account.data.identity < 1">Login</a>
+                            <a class="dropdown-item" dmx-show="conn_account.data.identity &gt; 0" dmx-on:click="run({'bootbox.confirm':{name:'logout',message:'Are you sure you want to logout?',title:'Logout',buttons:{confirm:{label:'Logout'},cancel:{label:'Cancel',className:'btn-danger'}},then:{steps:[{serverConnect:{name:'sc',outputType:'object',url:'/api/registration/logout',site:'XiaD'}},{run:{name:'Logout',outputType:'text',action:`notifies1.success(\'Logout Success!\');browser1.goto(\'/login\')`}}]}}})">Logout</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">My Account</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="modal" id="clockInOutModal" is="dmx-bs5-modal" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Clock In/Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <p>User: {{select1.value}}</p>
+                    <select id="select1" name="user_id2" class="form-select" dmx-bind:options="conn_employees.data.query" optiontext="user_firstName+' '+user_lastName" optionvalue="user_id">
+                        <option value="" disabled selected>Select User</option>
+                    </select>
+
+                    <div class="mt-3">
+                        <!-- Clock In Button -->
+                        <button class="btn btn-primary" id="clockInBtn" dmx-show="!clockInStore.data.where('user_id', select1.value).where('clockInTime.formatDate(&quot;yyyy-MM-dd&quot;)', currentTime.datetime.formatDate(&quot;yyyy-MM-dd&quot;)).hasItems()" dmx-on:click="clockInStore.upsert({user_id: select1.value},{clockedIn: true, clockInTime: currentTime.datetime.formatDate('yyyy-MM-dd HH:mm:ss'), user_id: select1.value})">Clock In</button>
+                        <!-- Clock Out Button -->
+                        <button class="btn btn-danger" id="clockOutBtn" dmx-show="clockInStore.data.where('user_id', select1.value).where('clockInTime.formatDate(&quot;yyyy-MM-dd&quot;)', currentTime.datetime.formatDate(&quot;yyyy-MM-dd&quot;)).hasItems()" dmx-on:click="clockInStore.update({user_id: select1.value},{clockOutTime: currentTime.datetime.formatDate('yyyy-MM-dd HH:mm:ss')})">Clock Out</button>
+                    </div>
+
+
+                    <form id="clockInOut" method="post" action="/api/admin/employee/clockInOut" is="dmx-serverconnect-form" dmx-on:success="notifies1.success('Recorded ');clockInOut.reset();clockInStore.clear()" dmx-on:error="notifies1.warning(conn_clockInOut.lastError.response)">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>Clock in time</th>
+                                        <th scope="row"></th>
+                                        <th>Clock out time</th>
+                                    </tr>
+                                </thead>
+                                <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="clockInStore.data" id="tableRepeat1">
+                                    <tr>
+                                        <td dmx-text="$id"></td>
+                                        <td dmx-text="user_id"></td>
+                                        <td dmx-text="clockInTime.formatDate('yyyy-MM-dd HH:mm:ss')"></td>
+                                        <td>
+                                            <input id="cIO_in{{$index}}" name="cIO_in[]" class="form-control" dmx-bind:value="clockInTime.formatDate('yyyy-MM-dd H:mm')" type="hidden">
+                                            <input id="users_id{{$index}}" name="user_id[]" class="form-control" dmx-bind:value="user_id" type="hidden">
+                                            <input id="cIO_out{{$index}}" name="cIO_out[]" class="form-control" dmx-bind:value="clockOutTime.formatDate('yyyy-MM-dd HH:mm')" type="hidden">
+                                        </td>
+                                        <td dmx-text="clockOutTime.formatDate('yyyy-MM-dd HH:mm:ss')"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button id="btn1" class="btn btn-outline-primary" type="submit" dmx-bind:disabled="select1.value.isEmpty()">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <dmx-serverconnect id="conn_employees" url="/api/admin/employee/list"></dmx-serverconnect>
+    <dmx-serverconnect id="conn_clockInOut" url="/api/admin/employee/clockInOut" noload></dmx-serverconnect>
+    <dmx-data-detail id="selectedEmployee" dmx-bind:data="conn_employees.data"></dmx-data-detail>
+    <dmx-notifications id="notifies1"></dmx-notifications>
+    <dmx-datetime id="currentTime" interval="1000"></dmx-datetime>
+</header>

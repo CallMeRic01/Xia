@@ -1,0 +1,196 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_staffManagement.ejs",
+      "linkedForm": "form1"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "filter"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "user_id",
+        "name": "user_id"
+      },
+      {
+        "type": "text",
+        "fieldName": "role",
+        "name": "role"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "role",
+                "column": "role"
+              },
+              {
+                "table": "role",
+                "column": "user_id"
+              },
+              {
+                "table": "user",
+                "column": "user_firstName"
+              },
+              {
+                "table": "user",
+                "column": "user_lastName"
+              },
+              {
+                "table": "user",
+                "column": "user_email"
+              },
+              {
+                "table": "role",
+                "column": "role_id"
+              }
+            ],
+            "params": [],
+            "table": {
+              "name": "role"
+            },
+            "primary": "role_id",
+            "joins": [
+              {
+                "table": "user",
+                "column": "*",
+                "type": "INNER",
+                "clauses": {
+                  "condition": "AND",
+                  "rules": [
+                    {
+                      "table": "user",
+                      "column": "user_id",
+                      "operation": "=",
+                      "operator": "equal",
+                      "value": {
+                        "table": "role",
+                        "column": "user_id",
+                        "type": "number"
+                      }
+                    }
+                  ]
+                },
+                "primary": "user_id"
+              }
+            ],
+            "query": "select `role`.`role`, `role`.`user_id`, `user`.`user_firstName`, `user`.`user_lastName`, `user`.`user_email`, `role`.`role_id` from `role` inner join `user` on `user`.`user_id` = `role`.`user_id`"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "text",
+            "name": "role"
+          },
+          {
+            "type": "number",
+            "name": "user_id"
+          },
+          {
+            "type": "text",
+            "name": "user_firstName"
+          },
+          {
+            "type": "text",
+            "name": "user_lastName"
+          },
+          {
+            "type": "text",
+            "name": "user_email"
+          },
+          {
+            "type": "number",
+            "name": "role_id"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "update",
+        "module": "dbupdater",
+        "action": "update",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "update",
+            "values": [
+              {
+                "table": "role",
+                "column": "role",
+                "type": "text",
+                "value": "{{$_POST.role}}"
+              }
+            ],
+            "table": "role",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "user_id",
+                  "field": "user_id",
+                  "type": "double",
+                  "operator": "equal",
+                  "value": "{{$_POST.user_id}}",
+                  "data": {
+                    "column": "user_id"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "role_id",
+            "query": "update `role` set `role` = ? where `user_id` = ?",
+            "params": [
+              {
+                "name": ":P1",
+                "type": "expression",
+                "value": "{{$_POST.role}}",
+                "test": ""
+              },
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P2",
+                "value": "{{$_POST.user_id}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ],
+        "output": true,
+        "disabled": true
+      }
+    ]
+  }
+}

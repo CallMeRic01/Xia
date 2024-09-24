@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/admin_product.ejs",
+      "linkedForm": "form_assign_days"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "dayofweek"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "text",
+        "fieldName": "dayOfWeek",
+        "name": "dayOfWeek"
+      },
+      {
+        "type": "array",
+        "fieldName": "productId[]",
+        "multiple": true,
+        "name": "productId"
+      },
+      {
+        "type": "array",
+        "name": "record",
+        "sub": [
+          {
+            "type": "text",
+            "name": "$_POST"
+          },
+          {
+            "type": "number",
+            "name": "repeat"
+          }
+        ]
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "delete",
+        "module": "dbupdater",
+        "action": "delete",
+        "options": {
+          "connection": "db",
+          "sql": {
+            "type": "delete",
+            "table": "productByDay",
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "pd_day",
+                  "field": "pd_day",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_POST.dayOfWeek}}",
+                  "data": {
+                    "column": "pd_day"
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "returning": "pd_id",
+            "query": "delete from `productByDay` where `pd_day` = ?",
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_POST.dayOfWeek}}",
+                "test": ""
+              }
+            ]
+          }
+        },
+        "meta": [
+          {
+            "name": "affected",
+            "type": "number"
+          }
+        ]
+      },
+      {
+        "name": "repeat",
+        "module": "core",
+        "action": "repeat",
+        "options": {
+          "repeat": "{{$_POST.productId}}",
+          "outputFields": [],
+          "exec": {
+            "steps": {
+              "name": "insert",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "db",
+                "sql": {
+                  "type": "insert",
+                  "values": [
+                    {
+                      "table": "productByDay",
+                      "column": "pd_day",
+                      "type": "text",
+                      "value": "{{$_POST.dayOfWeek}}"
+                    },
+                    {
+                      "table": "productByDay",
+                      "column": "pro_id",
+                      "type": "number",
+                      "value": "{{$_POST.productId[$index]}}"
+                    }
+                  ],
+                  "table": "productByDay",
+                  "returning": "pd_id",
+                  "query": "insert into `productByDay` (`pd_day`, `pro_id`) values (?, ?)",
+                  "params": [
+                    {
+                      "name": ":P1",
+                      "type": "expression",
+                      "value": "{{$_POST.dayOfWeek}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P2",
+                      "type": "expression",
+                      "value": "{{$_POST.productId[$index]}}",
+                      "test": ""
+                    }
+                  ]
+                }
+              },
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "text"
+                },
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "$index",
+            "type": "number"
+          },
+          {
+            "name": "$number",
+            "type": "number"
+          },
+          {
+            "name": "$name",
+            "type": "text"
+          },
+          {
+            "name": "$value",
+            "type": "object"
+          }
+        ],
+        "outputType": "array"
+      }
+    ]
+  }
+}

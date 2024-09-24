@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "options": {
+      "linkedFile": "/views/partials/navbar.ejs",
+      "linkedForm": "clockInOut"
+    },
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "filter"
+      }
+    ],
+    "$_POST": [
+      {
+        "type": "number",
+        "fieldName": "user_id",
+        "name": "user_id"
+      },
+      {
+        "type": "array",
+        "name": "record",
+        "sub": [
+          {
+            "type": "time",
+            "name": "NOW"
+          },
+          {
+            "type": "number",
+            "name": "$_POST"
+          }
+        ]
+      },
+      {
+        "type": "number",
+        "name": "user_id[$index]"
+      },
+      {
+        "type": "text",
+        "fieldName": "user_id2",
+        "name": "user_id2"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [],
+          "params": [
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.filter}}",
+              "test": ""
+            }
+          ],
+          "table": {
+            "name": "user_clockInOut"
+          },
+          "primary": "cIO_id",
+          "joins": [],
+          "query": "select * from `user_clockInOut` where `user_clockInOut`.`cIO_date` = ?",
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "user_clockInOut.cIO_date",
+                "field": "user_clockInOut.cIO_date",
+                "type": "date",
+                "operator": "equal",
+                "value": "{{$_GET.filter}}",
+                "data": {
+                  "table": "user_clockInOut",
+                  "column": "cIO_date",
+                  "type": "date",
+                  "columnObj": {
+                    "type": "date",
+                    "primary": false,
+                    "nullable": true,
+                    "name": "cIO_date"
+                  }
+                },
+                "operation": "="
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          }
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "cIO_id"
+        },
+        {
+          "type": "datetime",
+          "name": "cIO_in"
+        },
+        {
+          "type": "datetime",
+          "name": "cIO_out"
+        },
+        {
+          "type": "number",
+          "name": "user_id"
+        },
+        {
+          "type": "date",
+          "name": "cIO_date"
+        },
+        {
+          "type": "time",
+          "name": "cIO_hrsWorked"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

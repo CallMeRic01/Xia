@@ -1,0 +1,149 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "user_id"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "single",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [
+            {
+              "table": "user",
+              "column": "user_id"
+            },
+            {
+              "table": "user",
+              "column": "user_firstName"
+            },
+            {
+              "table": "user",
+              "column": "user_lastName"
+            },
+            {
+              "table": "user",
+              "column": "user_email"
+            },
+            {
+              "table": "user",
+              "column": "user_dateSignup"
+            }
+          ],
+          "params": [
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.user_id}}",
+              "test": "12"
+            }
+          ],
+          "table": {
+            "name": "user"
+          },
+          "primary": "user_id",
+          "joins": [],
+          "orders": [],
+          "sub": {
+            "role": {
+              "type": "select",
+              "table": {
+                "name": "role",
+                "alias": "role"
+              },
+              "key": "user_id",
+              "columns": [
+                {
+                  "table": "role",
+                  "column": "role_id"
+                },
+                {
+                  "table": "role",
+                  "column": "role"
+                }
+              ],
+              "params": [],
+              "primary": "role_id",
+              "joins": [],
+              "query": "select `role_id`, `role` from `role` as `role`"
+            }
+          },
+          "query": "select `user_id`, `user_firstName`, `user_lastName`, `user_email`, `user_dateSignup` from `user` where `user`.`user_id` = ?",
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "user.user_id",
+                "field": "user.user_id",
+                "type": "double",
+                "operator": "equal",
+                "value": "{{$_GET.user_id}}",
+                "data": {
+                  "table": "user",
+                  "column": "user_id",
+                  "type": "number",
+                  "columnObj": {
+                    "type": "increments",
+                    "primary": true,
+                    "nullable": false,
+                    "name": "user_id"
+                  }
+                },
+                "operation": "="
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          }
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "number",
+          "name": "user_id"
+        },
+        {
+          "type": "text",
+          "name": "user_firstName"
+        },
+        {
+          "type": "text",
+          "name": "user_lastName"
+        },
+        {
+          "type": "text",
+          "name": "user_email"
+        },
+        {
+          "type": "datetime",
+          "name": "user_dateSignup"
+        },
+        {
+          "name": "role",
+          "type": "array",
+          "sub": [
+            {
+              "type": "number",
+              "name": "role_id"
+            },
+            {
+              "type": "text",
+              "name": "role"
+            }
+          ]
+        }
+      ],
+      "outputType": "object"
+    }
+  }
+}

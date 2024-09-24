@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "$_POST": [
+      {
+        "type": "object",
+        "name": "product"
+      }
+    ],
+    "$_PARAM": [
+      {
+        "type": "object",
+        "name": "product"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "cart",
+        "module": "core",
+        "action": "setsession",
+        "options": {
+          "value": "{{$_POST.product}}"
+        }
+      },
+      {
+        "name": "currentCart",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{cart}}",
+          "key": "currentCart"
+        },
+        "meta": [],
+        "outputType": "text",
+        "output": true
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{currentCart==null}}",
+          "then": {
+            "steps": {
+              "name": "currentCart",
+              "module": "core",
+              "action": "setvalue",
+              "options": {
+                "key": "currentCart",
+                "value": []
+              },
+              "meta": [],
+              "outputType": "text"
+            }
+          }
+        },
+        "outputType": "boolean"
+      },
+      {
+        "name": "currentCartItem",
+        "module": "core",
+        "action": "repeat",
+        "options": {
+          "repeat": "{{currentCart}}",
+          "outputFields": [],
+          "exec": {
+            "steps": {
+              "name": "",
+              "module": "core",
+              "action": "condition",
+              "options": {
+                "if": "{{currentCartItem.id==$_POST.product.id}}",
+                "then": {
+                  "steps": [
+                    {
+                      "name": "newQuantity",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "value": "{{currentCartItem.quantity+$_POST.product.quantity}}",
+                        "key": "newQuantity"
+                      },
+                      "meta": [],
+                      "outputType": "text",
+                      "output": true
+                    },
+                    {
+                      "name": "currentCart[currentCart.indexOf(currentCartItem)].quantity",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "value": "{{newQuantity}}"
+                      },
+                      "meta": [],
+                      "outputType": "text"
+                    }
+                  ]
+                },
+                "else": {
+                  "steps": [
+                    {
+                      "name": "newProduct",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "newProduct",
+                        "value": "{{$_POST.product}}"
+                      },
+                      "meta": [],
+                      "outputType": "text"
+                    },
+                    {
+                      "name": "currentCart",
+                      "module": "core",
+                      "action": "setvalue",
+                      "options": {
+                        "key": "currentCart",
+                        "value": "{{currentCart.concat([newProduct])}}"
+                      },
+                      "meta": [],
+                      "outputType": "text"
+                    }
+                  ]
+                }
+              },
+              "outputType": "boolean"
+            }
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "name": "$index",
+            "type": "number"
+          },
+          {
+            "name": "$number",
+            "type": "number"
+          },
+          {
+            "name": "$name",
+            "type": "text"
+          },
+          {
+            "name": "$value",
+            "type": "object"
+          },
+          {
+            "name": "newQuantity",
+            "type": "text",
+            "sub": []
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "cart",
+        "module": "core",
+        "action": "setsession",
+        "options": {
+          "value": "{{currentCart}}"
+        }
+      }
+    ]
+  }
+}

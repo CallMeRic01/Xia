@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      },
+      {
+        "type": "text",
+        "name": "selected_date"
+      }
+    ]
+  },
+  "exec": {
+    "steps": {
+      "name": "query",
+      "module": "dbconnector",
+      "action": "select",
+      "options": {
+        "connection": "db",
+        "sql": {
+          "type": "select",
+          "columns": [
+            {
+              "table": "salesReport",
+              "column": "rep_date"
+            },
+            {
+              "table": "salesReport",
+              "column": "rep_opening"
+            },
+            {
+              "table": "salesReport",
+              "column": "rep_closing"
+            },
+            {
+              "table": "salesReport",
+              "column": "rep_expenses"
+            },
+            {
+              "table": "salesReport",
+              "column": "rep_remarks"
+            },
+            {
+              "table": "salesReport",
+              "column": "rep_proLoss"
+            }
+          ],
+          "params": [
+            {
+              "operator": "equal",
+              "type": "expression",
+              "name": ":P1",
+              "value": "{{$_GET.selected_date}}",
+              "test": ""
+            }
+          ],
+          "table": {
+            "name": "salesReport"
+          },
+          "primary": "rep_id",
+          "joins": [],
+          "wheres": {
+            "condition": "AND",
+            "rules": [
+              {
+                "id": "salesReport.rep_date",
+                "field": "salesReport.rep_date",
+                "type": "datetime",
+                "operator": "equal",
+                "value": "{{$_GET.selected_date}}",
+                "data": {
+                  "table": "salesReport",
+                  "column": "rep_date",
+                  "type": "datetime",
+                  "columnObj": {
+                    "type": "datetime",
+                    "primary": false,
+                    "nullable": true,
+                    "name": "rep_date"
+                  }
+                },
+                "operation": "="
+              }
+            ],
+            "conditional": null,
+            "valid": true
+          },
+          "query": "select `rep_date`, `rep_opening`, `rep_closing`, `rep_expenses`, `rep_remarks`, `rep_proLoss` from `salesReport` where `salesReport`.`rep_date` = ? order by `rep_date` DESC",
+          "orders": [
+            {
+              "table": "salesReport",
+              "column": "rep_date",
+              "direction": "DESC"
+            }
+          ]
+        }
+      },
+      "output": true,
+      "meta": [
+        {
+          "type": "datetime",
+          "name": "rep_date"
+        },
+        {
+          "type": "number",
+          "name": "rep_opening"
+        },
+        {
+          "type": "number",
+          "name": "rep_closing"
+        },
+        {
+          "type": "number",
+          "name": "rep_expenses"
+        },
+        {
+          "type": "text",
+          "name": "rep_remarks"
+        },
+        {
+          "type": "number",
+          "name": "rep_proLoss"
+        }
+      ],
+      "outputType": "array"
+    }
+  }
+}

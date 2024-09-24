@@ -1,0 +1,61 @@
+<!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="admin_addProduct" appConnect="local" components="{dmxSummernote:{},dmxMediumEditor:{},dmxBrowser:{},dmxNotifications:{},dmxDropzone:{},dmxValidator:{}}" jquery_slim_35="cdn" -->
+<meta name="ac:route" content="/admin_addProduct">
+<dmx-notifications id="notifies1"></dmx-notifications>
+<div is="dmx-browser" id="browser1"></div>
+<dmx-serverconnect id="serverconnect1" url="/api/admin/product/addProduct" noload="true"></dmx-serverconnect>
+<%- await include('/partials/navbar', Object.assign({}, locals)) %>
+<link rel="stylesheet" href="/css/style.css">
+
+<div class="container wappler-block">
+    <form id="addProduct" method="post" is="dmx-serverconnect-form" action="/api/admin/product/addProduct" dmx-on:success="addProduct.reset();notifies1.success('Added Successfully');browser1.goto('/admin_product',true,'Admin Product')" dmx-on:error="notifies1.danger('Error Occured')">
+        <div class="row justify-content-center">
+            <div class="col text-center">
+                <div class="row">
+                    <div class="col-12">
+                        <h1>Add Product</h1>
+                        <p class="text-h3">Enter your product details below.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-xl-8 text-center text-bg-secondary shadow-lg rounded style1 col-lg-11 fade-in">
+                <div class="row align-items-center">
+                    <div class="col-md-5 mt-4 col-6">
+                        <input type="text" id="product_name" name="pro_name" class="form-control" placeholder="Product Name" required="">
+                    </div>
+                    <div class="col-md-5 mt-4 col-6">
+                        <input type="number" id="product_price" name="pro_price" class="form-control" placeholder="Product Price">
+                    </div>
+                    <div class="col-md-5 mt-4 col-6">
+                        <p class="text-start"><b>Stock Amount:</b></p>
+                        <input id="product_stock" name="pro_stock" type="number" class="form-control">
+                    </div>
+                    <div class="col-md-5 mt-4 col-6">
+                        <div class="form-group mb-3 text-start">
+                            <legend class="col-sm-2 col-form-label mt-1 pt-1"><b>Status:</b></legend>
+                            <div class="form-check">
+                                <input class="form-check-input mt-3" type="checkbox" id="product_status" name="pro_stat" dmx-on:checked="product_status.setValue(1)">
+                                <label class="form-check-label mt-2 pt-1" for="product_status">is Available</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-12 mt-3">
+                        <div class="form-group mb-3 row">
+                            <label for="product_image" class="col-sm-2 col-form-label"><b>Image upload</b></label>
+                            <div class="col-sm-10">
+                                <input type="file" class="form-control ms-2" name="pro_image" aria-describedby="input1_help" is="dmx-dropzone">
+                                <small id="input1_help" class="form-text text-muted">Select here your image for upload.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-start mt-1 mb-3 col-md-5">
+                        <p><b>Product Description:</b></p>
+                        <textarea id="pro_description" class="form-control" name="pro_desc"></textarea>
+                    </div>
+                    <div class="col-12 col-md-2 mt-3 mb-2 add">
+                        <button id="register1_submit" class="btn text-bg-light" type="submit"><b>Add Product</b></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
