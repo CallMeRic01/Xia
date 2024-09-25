@@ -264,12 +264,13 @@
         </div>
 
         <!-- Points Redeem Modal -->
-        <form id="Refunding" method="post">
+        <form id="Refunding" method="post" is="dmx-serverconnect-form" action="/api/admin/order/editOrderDetails" dmx-on:success="editOrder.hide();notifies1.success('Update Success');conn_viewOrder.load({});conn_orderDetails.load({});editOrder.hide()" dmx-on:error="notifies1.warning('Something Went Wrong')">
             <div class="modal" id="editOrder" is="dmx-bs5-modal" tabindex="-1">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Order ID: {{conn_orderDetails.data.custom[0].ord_id}}</h5>
+                            <input id="OrderID" name="ord_id" type="text" class="form-control" dmx-bind:value="conn_orderDetails.data.custom[0].ord_id">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -289,8 +290,11 @@
                                             <td dmx-text="pro_id"></td>
                                             <td dmx-text="pro_name"></td>
                                             <td dmx-text="pro_price"></td>
-                                            <td dmx-text="detOrd_quantity"></td>
-                                            <td dmx-text="pro_price*detOrd_quantity"></td>
+                                            <td>
+                                                <input id="quantityEdit" name="detOrd_quantity" type="number" class="form-control" dmx-bind:value="detOrd_quantity">
+                                                <input id="ProductID" name="pro_id[]" type="hidden" class="form-control" dmx-bind:value="pro_id">
+                                            </td>
+                                            <td dmx-text="pro_price*quantityEdit.value"></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -298,7 +302,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>
                 </div>
