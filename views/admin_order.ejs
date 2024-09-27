@@ -136,9 +136,9 @@
                         <div class="form-group">
                             <label for="paymentMethod"><b>Payment Method</b>: </label>
                             <select id="paymentMethod" name="ord_payMethod" class="form-select">
+
                                 <option value="Cash">Cash</option>
-                                <option value="TnG">TnG</option>
-                                <option value="Grab">Grab</option>
+                                <option value="EWallet">E-Wallet</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -148,11 +148,11 @@
                             <label for="isTakeaway">Yes</label>
                         </div>
                         <div class="form-group">
-                            <label dmx-hide="paymentMethod.value == 'TnG' || paymentMethod.value == 'Grab'"><b>Amount Paid</b>: </label>
-                            <input type="number" id="order_amountPaid" name="ord_paidCash" class="form-control" dmx-bind:value="(paymentMethod.value == 'Cash' ? value : 0)" dmx-hide="paymentMethod.value == 'TnG' || paymentMethod.value == 'Grab'">
+                            <label dmx-hide="paymentMethod.value == 'E-Wallet'"><b>Amount Paid</b>: </label>
+                            <input type="number" id="order_amountPaid" name="ord_paidCash" class="form-control" dmx-bind:value="(paymentMethod.value == 'Cash' ? value : 0)" dmx-hide="paymentMethod.value == 'E-Wallet'">
                         </div>
                         <div class="form-group">
-                            <label dmx-hide="paymentMethod.value == 'TnG' || paymentMethod.value == 'Grab'"><b>Change</b>: </label>
+                            <label dmx-hide="paymentMethod.value == 'E-Wallet'"><b>Change</b>: </label>
                             <span dmx-show="(order_amountPaid.value - 
                             (discountType.value == 'percent' ? 
                             (cart.data.sum(`(pro_price * detOrd_quantity)`).round(2) * (1 - order_discount.value / 100)) + takeawayFee.value : 
@@ -274,30 +274,10 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-hover table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Price</th>
-                                            <th>Quantity</th>
-                                            <th>Total Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_orderDetails.data.custom" id="tableRepeat4">
-                                        <tr>
-                                            <td dmx-text="pro_id"></td>
-                                            <td dmx-text="pro_name"></td>
-                                            <td dmx-text="pro_price"></td>
-                                            <td>
-                                                <input id="quantityEdit" name="detOrd_quantity" type="number" class="form-control" dmx-bind:value="detOrd_quantity">
-                                                <input id="ProductID" name="pro_id[]" type="hidden" class="form-control" dmx-bind:value="pro_id">
-                                            </td>
-                                            <td dmx-text="pro_price*quantityEdit.value"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div dmx-repeat:orderdetails="conn_orderDetails.data.custom">
+                                <p><b>Product ID</b>: {{pro_id}}</p>
+                                <p><b>Name</b>: {{pro_name}}&nbsp;<b>Price</b>: {{pro_price}}&nbsp;<b>Quantity</b>: {{detOrd_quantity}}</p>
+                                <br>
                             </div>
                         </div>
                         <div class="modal-footer">

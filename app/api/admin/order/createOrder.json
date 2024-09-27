@@ -647,6 +647,34 @@
             "type": "object"
           },
           {
+            "name": "insertDetails_copy1",
+            "type": "text",
+            "sub": [
+              {
+                "name": "identity",
+                "type": "text"
+              },
+              {
+                "name": "affected",
+                "type": "number"
+              }
+            ]
+          },
+          {
+            "name": "insertDetails_copy",
+            "type": "text",
+            "sub": [
+              {
+                "name": "identity",
+                "type": "text"
+              },
+              {
+                "name": "affected",
+                "type": "number"
+              }
+            ]
+          },
+          {
             "name": "insertDetails",
             "type": "text",
             "sub": [

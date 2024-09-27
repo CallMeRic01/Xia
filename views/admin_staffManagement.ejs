@@ -1,13 +1,13 @@
 <!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="admin_staffManagement" appConnect="local" components="{dmxBootstrap5TableGenerator:{},dmxBootstrap5Modal:{},dmxNotifications:{},dmxBootbox5:{},dmxBootstrap5Alert:{},dmxDatePicker:{},dmxFormatter:{}}" jquery_slim_35="cdn" moment_2="cdn" -->
 <!-- Wappler include head-page="layouts/main" fontawesome_5="cdn" bootstrap5="local" is="dmx-app" id="admin_staffManagement" appconnect="local" components="{dmxBootstrap5TableGenerator:{},dmxBootstrap5Modal:{},dmxNotifications:{},dmxBootbox5:{},dmxBootstrap5Alert:{}}" -->
-
+<link rel="stylesheet" href="/css/admin_staff.css">
 <%- await include('/partials/navbar', Object.assign({}, locals)) %>
 <dmx-serverconnect id="CIOHistory" url="/api/admin/employee/clockInOutHistory" dmx-param:filter="form1.History.text1.value"></dmx-serverconnect>
 <div class="row">
     <div class="col-10">
-        <h1>Staff Lists</h1>
+        <h1 class="text-start">Staff Lists</h1>
     </div>
-    <div class="col-2"><button id="btn2" class="btn btn-info text-bg-primary" dmx-on:click="form1.History.show();CIOHistory.load({})">History&nbsp;</button></div>
+    <div class="col-2"><button id="btn2" class="btn btn-info text-bg-primary" dmx-on:click="form1.History.show();CIOHistory.load({})"><i class="fas fa-history"></i>&nbsp;History&nbsp;</button></div>
 
 
 </div>
@@ -85,10 +85,10 @@
             <tbody is="dmx-repeat" dmx-generator="bs5table" dmx-bind:repeat="conn_AllStaff.data.query" id="tableRepeat2">
                 <tr>
                     <td dmx-text="user_id"></td>
-                    <td dmx-text="user_firstName + ' ' + user_lastName" dmx-on:click="conn_singleStaff.load({user_id: user_id});ViewStaff.show()"></td>
+                    <td dmx-text="user_firstName + ' ' + user_lastName" dmx-on:click="conn_singleStaff.load({user_id: user_id});ViewStaff.show()" class="text-primary fw-bold clickable-name"></td>
                     <td dmx-text="role == 'A' ? 'Admin' : 'Member'"></td>
                     <td class="w-auto">
-                        <button id="btn1" class="btn w-auto btn-danger" dmx-on:click="run({'bootbox.confirm':{name:'removeStaff',message:`\'Are you sure you want to remove this staff? \'+user_firstName+\' \'+role_id+\'  \'`,title:'Remove Staff',buttons:{confirm:{label:'Remove'},cancel:{label:'Cancel'}},then:{steps:[{serverConnect:{name:'sc',outputType:'object',url:'/api/security/users/deleteStaff',site:'XiaD',params:{user_id:`user_id`,role_id:`role_id`}}},{run:{outputType:'text',action:`notifies1.success(\'Remove Success\')`}},{run:{outputType:'text',action:`conn_AllStaff.load()`}}]}}})">Delete</button>
+                        <button id="btn1" class="btn w-auto btn-danger" dmx-on:click="run({'bootbox.confirm':{name:'removeStaff',message:`\'Are you sure you want to remove this staff? \'+user_firstName+\' \'+role_id+\'  \'`,title:'Remove Staff',buttons:{confirm:{label:'Remove'},cancel:{label:'Cancel'}},then:{steps:[{serverConnect:{name:'sc',outputType:'object',url:'/api/security/users/deleteStaff',site:'XiaD',params:{user_id:`user_id`,role_id:`role_id`}}},{run:{outputType:'text',action:`notifies1.success(\'Remove Success\')`}},{run:{outputType:'text',action:`conn_AllStaff.load()`}}]}}})"><i class="fas fa-user-times"></i>&nbsp;</button>
                     </td>
                 </tr>
             </tbody>

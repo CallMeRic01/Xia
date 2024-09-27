@@ -73,6 +73,7 @@ body {
 .small-card {
     width: 100%;
     max-width: 200px;
+    
     margin: 15px;
     border-radius: 15px;
     overflow: hidden;
@@ -93,7 +94,8 @@ body {
 }
 
 .small-card img {
-    height: 120px;
+    
+    max-height: 150px;
     -o-object-fit: cover;
        object-fit: cover;
     -webkit-transition: -webkit-transform 0.3s ease;
