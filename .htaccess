@@ -1,0 +1,17 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/fundingp/xiad"
+PassengerBaseURI "/"
+PassengerNodejs "/home/fundingp/nodevenv/xiad/22/bin/node"
+PassengerAppType node
+PassengerStartupFile /home/fundingp/xiad/index.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+SetEnv DB_HOST 127.0.0.1
+SetEnv DB_NAME fundingp_xiad
+SetEnv DB_PORT 3306
+SetEnv SECRET E4837xwZFo0Ywf0
+SetEnv DB_PASSWORD Xiad123!@#Xiad
+SetEnv DB_USER fundingp_xiad1
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
